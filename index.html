@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SLDM — Scientific Literature Data Miner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ═══════════════════════════════════════════
+       TOKENS
+    ═══════════════════════════════════════════ */
+    :root {
+      --cream:   #F7F4EF;
+      --paper:   #FDFBF8;
+      --ink:     #1C1C1E;
+      --ink-2:   #4A4A52;
+      --ink-3:   #8E8E99;
+
+      --rose:    #F2A7B0;
+      --sky:     #A8D4F5;
+      --mint:    #A8E6CF;
+      --amber:   #F5D190;
+      --lavender:#C5B8F0;
+      --peach:   #F5C4A1;
+
+      --rose-d:    #C97080;
+      --sky-d:     #5A9FD4;
+      --mint-d:    #5AB890;
+      --amber-d:   #C9A040;
+      --lavender-d:#7B68C8;
+
+      --border:  rgba(28,28,30,.08);
+      --shadow:  0 4px 24px rgba(28,28,30,.07);
+      --shadow-lg: 0 12px 48px rgba(28,28,30,.11);
+
+      --r: 14px;
+      --r-sm: 8px;
+    }
+
+    /* ═══════════════════════════════════════════
+       RESET / BASE
+    ═══════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    ::selection { background: var(--lavender); color: var(--ink); }
+
+    img { max-width: 100%; display: block; }
+    a { color: inherit; text-decoration: none; }
+
+    h1, h2, h3, h4 { font-family: 'Playfair Display', serif; line-height: 1.2; }
+
+    /* ═══════════════════════════════════════════
+       NAV
+    ═══════════════════════════════════════════ */
+    #navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(253,251,248,.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      transition: box-shadow .3s;
+    }
+    #navbar.scrolled { box-shadow: var(--shadow); }
+
+    .nav-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px; height: 62px;
+    }
+
+    .nav-logo {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.15rem; font-weight: 500; letter-spacing: .04em;
+    }
+    .logo-s { color: var(--lavender-d); }
+    .logo-ldm { color: var(--ink); }
+
+    .nav-links {
+      display: flex; gap: 8px; list-style: none;
+    }
+    .nav-links a {
+      font-size: .875rem; font-weight: 400; color: var(--ink-2);
+      padding: 6px 14px; border-radius: 20px;
+      transition: background .2s, color .2s;
+    }
+    .nav-links a:hover { background: var(--cream); color: var(--ink); }
+
+    .nav-cta {
+      background: var(--ink) !important;
+      color: var(--paper) !important;
+      font-weight: 500 !important;
+    }
+    .nav-cta:hover { background: #333 !important; }
+
+    /* ═══════════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════════ */
+    #hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 100px 32px 60px;
+      position: relative; overflow: hidden;
+    }
+
+    #network-canvas {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      max-width: 1100px; margin: 0 auto; width: 100%;
+      position: relative; z-index: 2;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;
+    }
+
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--lavender); color: var(--lavender-d);
+      font-family: 'DM Mono', monospace; font-size: .78rem; font-weight: 500;
+      padding: 5px 13px; border-radius: 20px; letter-spacing: .06em;
+      margin-bottom: 20px;
+    }
+    .hero-tag::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--lavender-d);
+    }
+
+    .hero-title {
+      font-size: clamp(2.2rem, 4.5vw, 3.6rem);
+      font-weight: 700; line-height: 1.1;
+      margin-bottom: 8px;
+    }
+    .hero-title em {
+      font-style: italic; color: var(--lavender-d);
+    }
+
+    .hero-subtitle {
+      font-family: 'DM Mono', monospace;
+      font-size: .9rem; color: var(--ink-3);
+      letter-spacing: .1em; margin-bottom: 24px;
+    }
+
+    .hero-desc {
+      font-size: 1.05rem; color: var(--ink-2); line-height: 1.7;
+      max-width: 480px; margin-bottom: 36px;
+    }
+
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: 'DM Sans', sans-serif; font-size: .9rem; font-weight: 500;
+      padding: 12px 24px; border-radius: 10px; border: none; cursor: pointer;
+      transition: transform .2s, box-shadow .2s, background .2s;
+      text-decoration: none;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .btn:active { transform: translateY(0); }
+
+    .btn-primary {
+      background: var(--ink); color: var(--paper);
+    }
+    .btn-primary:hover { background: #2c2c30; }
+
+    .btn-ghost {
+      background: transparent; color: var(--ink-2);
+      border: 1.5px solid var(--border);
+    }
+    .btn-ghost:hover { background: var(--cream); border-color: transparent; }
+
+    /* hero right — app mockup */
+    .hero-mockup {
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      aspect-ratio: 4/3;
+      display: flex; flex-direction: column;
+    }
+    .mockup-bar {
+      background: rgba(28,28,30,.05);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .mockup-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+    }
+    .mockup-body {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      padding: 20px; flex-direction: column; gap: 10px;
+    }
+    .mockup-placeholder {
+      width: 100%; flex: 1;
+      background: white;
+      border: 2px dashed var(--border);
+      border-radius: var(--r);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 8px; color: var(--ink-3);
+      font-size: .82rem; font-family: 'DM Mono', monospace;
+    }
+    .mockup-placeholder svg { opacity: .35; }
+    .mockup-caption {
+      font-size: .75rem; color: var(--ink-3); font-style: italic;
+      text-align: center;
+    }
+
+    /* ═══════════════════════════════════════════
+       SECTION WRAPPER
+    ═══════════════════════════════════════════ */
+    section { padding: 96px 32px; }
+
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: .75rem; font-weight: 500; letter-spacing: .12em;
+      color: var(--ink-3); text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      margin-bottom: 16px;
+    }
+
+    .section-lead {
+      font-size: 1.05rem; color: var(--ink-2); line-height: 1.7;
+      max-width: 600px; margin-bottom: 56px;
+    }
+
+    /* ═══════════════════════════════════════════
+       DOWNLOAD SECTION
+    ═══════════════════════════════════════════ */
+    #download { background: var(--cream); }
+
+    .download-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    }
+
+    .dl-card {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 28px 24px;
+      display: flex; flex-direction: column; gap: 16px;
+      box-shadow: var(--shadow);
+      transition: transform .25s, box-shadow .25s;
+      position: relative; overflow: hidden;
+    }
+    .dl-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    }
+    .dl-card.windows::before { background: var(--sky); }
+    .dl-card.linux::before   { background: var(--mint); }
+    .dl-card.mac::before     { background: var(--rose); }
+
+    .dl-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+
+    .dl-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+    }
+    .dl-card.windows .dl-icon { background: var(--sky); }
+    .dl-card.linux   .dl-icon { background: var(--mint); }
+    .dl-card.mac     .dl-icon { background: var(--rose); }
+
+    .dl-name { font-family: 'Playfair Display', serif; font-size: 1.2rem; }
+    .dl-desc { font-size: .875rem; color: var(--ink-2); line-height: 1.5; flex: 1; }
+
+    .dl-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 10px 20px; border-radius: var(--r-sm);
+      font-size: .875rem; font-weight: 500; border: none; cursor: pointer;
+      transition: filter .2s, transform .2s;
+      text-decoration: none;
+    }
+    .dl-btn:hover { filter: brightness(.93); transform: translateY(-1px); }
+
+    .dl-card.windows .dl-btn { background: var(--sky);     color: var(--sky-d); }
+    .dl-card.linux   .dl-btn { background: var(--mint);    color: var(--mint-d); }
+    .dl-card.mac     .dl-btn { background: var(--rose);    color: var(--rose-d); }
+
+    .dl-notice {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: .72rem; color: var(--ink-3); font-style: italic;
+      margin-top: 4px;
+    }
+    .dl-notice::before {
+      content: '⚠'; font-style: normal; font-size: .7rem;
+    }
+
+    .dl-version {
+      font-family: 'DM Mono', monospace;
+      font-size: .72rem; color: var(--ink-3);
+    }
+
+    /* ═══════════════════════════════════════════
+       TABS (Como funciona)
+    ═══════════════════════════════════════════ */
+    #how { background: var(--paper); }
+
+    .tabs-nav {
+      display: flex; gap: 4px;
+      background: var(--cream); border-radius: 12px;
+      padding: 4px; width: fit-content; margin-bottom: 40px;
+    }
+
+    .tab-btn {
+      padding: 9px 22px; border-radius: 9px; border: none;
+      font-family: 'DM Sans', sans-serif; font-size: .9rem; font-weight: 400;
+      background: transparent; color: var(--ink-2); cursor: pointer;
+      transition: background .2s, color .2s, box-shadow .2s;
+    }
+    .tab-btn.active {
+      background: var(--paper); color: var(--ink); font-weight: 500;
+      box-shadow: var(--shadow);
+    }
+
+    .tab-panel { display: none; animation: fadeIn .3s ease; }
+    .tab-panel.active { display: block; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    /* user tab */
+    .features-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;
+    }
+
+    .feat-card {
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 24px;
+      display: flex; gap: 18px; align-items: flex-start;
+      transition: transform .2s;
+    }
+    .feat-card:hover { transform: translateY(-2px); }
+
+    .feat-icon {
+      width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+    }
+
+    .feat-card:nth-child(1) .feat-icon { background: var(--lavender); }
+    .feat-card:nth-child(2) .feat-icon { background: var(--sky); }
+    .feat-card:nth-child(3) .feat-icon { background: var(--mint); }
+    .feat-card:nth-child(4) .feat-icon { background: var(--amber); }
+    .feat-card:nth-child(5) .feat-icon { background: var(--rose); }
+    .feat-card:nth-child(6) .feat-icon { background: var(--peach); }
+
+    .feat-body h4 { font-size: 1rem; margin-bottom: 6px; }
+    .feat-body p  { font-size: .875rem; color: var(--ink-2); line-height: 1.6; }
+
+    /* workflow */
+    .workflow { display: flex; flex-direction: column; gap: 0; max-width: 680px; }
+
+    .wf-step {
+      display: flex; gap: 24px; align-items: flex-start;
+      position: relative;
+    }
+    .wf-step:not(:last-child)::after {
+      content: ''; position: absolute;
+      left: 19px; top: 44px; width: 2px;
+      height: calc(100% - 12px);
+      background: linear-gradient(to bottom, var(--border), transparent);
+    }
+
+    .wf-num {
+      width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Mono', monospace; font-size: .85rem; font-weight: 500;
+      border: 2px solid var(--border); background: var(--paper);
+      position: relative; z-index: 1;
+    }
+    .wf-step:nth-child(1) .wf-num { border-color: var(--lavender); color: var(--lavender-d); }
+    .wf-step:nth-child(2) .wf-num { border-color: var(--sky);      color: var(--sky-d); }
+    .wf-step:nth-child(3) .wf-num { border-color: var(--mint);     color: var(--mint-d); }
+    .wf-step:nth-child(4) .wf-num { border-color: var(--amber);    color: var(--amber-d); }
+    .wf-step:nth-child(5) .wf-num { border-color: var(--rose);     color: var(--rose-d); }
+
+    .wf-body { padding: 8px 0 36px; }
+    .wf-body h4 { font-size: 1rem; margin-bottom: 5px; }
+    .wf-body p  { font-size: .875rem; color: var(--ink-2); line-height: 1.6; }
+
+    /* tech tab */
+    .tech-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 32px;
+    }
+
+    .tech-block h4 {
+      font-size: 1rem; margin-bottom: 12px; color: var(--ink);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .tech-block h4::before {
+      content: ''; width: 8px; height: 8px; border-radius: 50%;
+    }
+    .tech-block:nth-child(1) h4::before { background: var(--lavender-d); }
+    .tech-block:nth-child(2) h4::before { background: var(--sky-d); }
+    .tech-block:nth-child(3) h4::before { background: var(--mint-d); }
+    .tech-block:nth-child(4) h4::before { background: var(--rose-d); }
+
+    .tech-block p {
+      font-size: .875rem; color: var(--ink-2); line-height: 1.7; margin-bottom: 14px;
+    }
+
+    .pill-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pill {
+      font-family: 'DM Mono', monospace; font-size: .73rem;
+      padding: 4px 10px; border-radius: 20px; border: 1.5px solid var(--border);
+      color: var(--ink-2); background: var(--cream);
+    }
+
+    .arch-diagram {
+      grid-column: 1 / -1;
+      background: var(--cream); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 28px;
+    }
+    .arch-diagram h4 { font-size: 1rem; margin-bottom: 20px; }
+
+    .arch-flow {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 10px;
+    }
+    .arch-box {
+      background: var(--paper); border: 1px solid var(--border);
+      border-radius: var(--r-sm); padding: 12px 16px; text-align: center;
+      font-size: .8rem; flex: 1; min-width: 100px;
+    }
+    .arch-box .arch-label {
+      font-family: 'DM Mono', monospace; font-size: .7rem;
+      color: var(--ink-3); display: block; margin-bottom: 3px;
+    }
+    .arch-box .arch-name { font-weight: 500; }
+
+    .arch-arrow {
+      color: var(--ink-3); font-size: 1.1rem; flex-shrink: 0;
+    }
+
+    /* ═══════════════════════════════════════════
+       SCREENSHOTS
+    ═══════════════════════════════════════════ */
+    #screenshots { background: var(--cream); }
+
+    .screenshots-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    }
+
+    .shot-card {
+      border-radius: var(--r); overflow: hidden;
+      border: 1px solid var(--border); box-shadow: var(--shadow);
+      background: var(--paper);
+      transition: transform .25s, box-shadow .25s;
+    }
+    .shot-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+
+    .shot-img {
+      aspect-ratio: 16/10;
+      background: var(--cream);
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 10px; padding: 20px;
+      color: var(--ink-3);
+      font-size: .8rem; font-family: 'DM Mono', monospace;
+      text-align: center;
+    }
+    .shot-img .shot-icon { font-size: 2rem; opacity: .4; }
+    .shot-caption {
+      padding: 14px 16px;
+      font-size: .85rem; font-weight: 500;
+    }
+    .shot-sub {
+      padding: 0 16px 14px;
+      font-size: .78rem; color: var(--ink-3);
+    }
+
+    /* ═══════════════════════════════════════════
+       ABOUT / REGISTRO
+    ═══════════════════════════════════════════ */
+    #about { background: var(--paper); }
+
+    .about-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start;
+    }
+
+    .about-text p {
+      font-size: .95rem; color: var(--ink-2); line-height: 1.75;
+      margin-bottom: 16px;
+    }
+
+    .registro-card {
+      background: var(--cream); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 28px;
+    }
+    .registro-card h3 {
+      font-size: 1.1rem; margin-bottom: 6px;
+    }
+    .registro-card .reg-sub {
+      font-size: .82rem; color: var(--ink-3); margin-bottom: 20px;
+    }
+
+    .reg-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+      font-size: .875rem;
+    }
+    .reg-row:last-child { border-bottom: none; }
+    .reg-key { color: var(--ink-3); }
+    .reg-val {
+      font-family: 'DM Mono', monospace; font-size: .82rem;
+      color: var(--ink); font-weight: 500;
+    }
+    .reg-pending {
+      font-style: italic; color: var(--ink-3); font-family: 'DM Sans', sans-serif;
+      font-size: .82rem; font-weight: 300;
+    }
+
+    /* ═══════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════ */
+    footer {
+      background: var(--ink); color: rgba(255,255,255,.6);
+      padding: 48px 32px;
+    }
+    .footer-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 24px;
+    }
+    .footer-logo {
+      font-family: 'DM Mono', monospace; font-size: 1rem;
+      color: rgba(255,255,255,.9); letter-spacing: .04em;
+    }
+    .footer-logo span { color: var(--lavender); }
+    .footer-copy { font-size: .82rem; }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a {
+      font-size: .82rem; color: rgba(255,255,255,.5);
+      transition: color .2s;
+    }
+    .footer-links a:hover { color: rgba(255,255,255,.9); }
+
+    /* ═══════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════ */
+    @media (max-width: 900px) {
+      .hero-inner       { grid-template-columns: 1fr; gap: 40px; }
+      .hero-mockup      { max-width: 480px; }
+      .download-grid    { grid-template-columns: 1fr; max-width: 420px; }
+      .features-grid    { grid-template-columns: 1fr; }
+      .tech-grid        { grid-template-columns: 1fr; }
+      .screenshots-grid { grid-template-columns: 1fr; max-width: 420px; }
+      .about-grid       { grid-template-columns: 1fr; gap: 32px; }
+      .nav-links        { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════ NAV ════════════════════════════ -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a href="#hero" class="nav-logo">
+      <span class="logo-s">S</span><span class="logo-ldm">LDM</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#how">Como funciona</a></li>
+      <li><a href="#screenshots">Screenshots</a></li>
+      <li><a href="#about">Sobre</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ════════════════════════════ HERO ════════════════════════════ -->
+<section id="hero">
+  <canvas id="network-canvas"></canvas>
+
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-tag">v1.0.0 &nbsp;·&nbsp; Software Científico</div>
+      <h1 class="hero-title">
+        Scientific<br/>
+        <em>Literature</em><br/>
+        Data Miner
+      </h1>
+      <p class="hero-subtitle">SLDM &nbsp;—&nbsp; Mineração de Literatura Científica</p>
+      <p class="hero-desc">
+        Uma ferramenta desktop para organizar artigos científicos, identificar
+        automaticamente compostos, espécies e parâmetros de interesse, e gerar
+        visualizações exploratórias prontas para publicação.
+      </p>
+      <div class="hero-actions">
+        <a href="#how" class="btn btn-ghost">
+          Como funciona →
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="hero-mockup">
+        <div class="mockup-bar">
+          <div class="mockup-dot" style="background:var(--rose)"></div>
+          <div class="mockup-dot" style="background:var(--amber)"></div>
+          <div class="mockup-dot" style="background:var(--mint)"></div>
+        </div>
+        <div class="mockup-body">
+          <div class="mockup-placeholder">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <path d="M3 9h18M9 21V9"/>
+            </svg>
+            Captura de tela do app aqui
+            <span style="font-size:.7rem;opacity:.6">Sugestão: janela principal com artigos carregados</span>
+          </div>
+          <p class="mockup-caption">Interface principal do SLDM</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════ DOWNLOAD ════════════════════════════ -->
+<section id="download">
+  <div class="section-inner">
+    <p class="section-label">Download</p>
+    <h2 class="section-title">Escolha sua plataforma</h2>
+    <p class="section-lead">
+      Sem instalação de Python necessária. Baixe, extraia e execute.
+      O executável já inclui todas as dependências embutidas.
+    </p>
+
+    <div class="download-grid">
+
+      <div class="dl-card windows">
+        <div class="dl-icon">🪟</div>
+        <div>
+          <div class="dl-name">Windows</div>
+          <div class="dl-version">v1.0.0 · Windows 10 / 11</div>
+        </div>
+        <p class="dl-desc">
+          Versão testada e estável. Extraia a pasta <code>SLDM/</code>
+          e execute <code>SLDM.exe</code>. Não requer instalação.
+        </p>
+        <a href="#" class="dl-btn">
+          ↓ &nbsp;Download .zip
+        </a>
+      </div>
+
+      <div class="dl-card linux">
+        <div class="dl-icon">🐧</div>
+        <div>
+          <div class="dl-name">Linux</div>
+          <div class="dl-version">v1.0.0 · Ubuntu / Debian</div>
+        </div>
+        <p class="dl-desc">
+          Extraia a pasta e execute o binário <code>SLDM</code> via terminal.
+          Pode ser necessário: <code>chmod +x SLDM</code>
+        </p>
+        <a href="#" class="dl-btn">↓ &nbsp;Download .tar.gz</a>
+        <span class="dl-notice">Versão não pôde ser testada pelo autor</span>
+      </div>
+
+      <div class="dl-card mac">
+        <div class="dl-icon">🍎</div>
+        <div>
+          <div class="dl-name">macOS</div>
+          <div class="dl-version">v1.0.0 · macOS 12+</div>
+        </div>
+        <p class="dl-desc">
+          Extraia e execute o binário. Se bloqueado pelo Gatekeeper:
+          <em>clique direito → Abrir</em>.
+        </p>
+        <a href="#" class="dl-btn">↓ &nbsp;Download .zip</a>
+        <span class="dl-notice">Versão não pôde ser testada pelo autor</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════ COMO FUNCIONA ════════════════════════════ -->
+<section id="how">
+  <div class="section-inner">
+    <p class="section-label">Documentação</p>
+    <h2 class="section-title">Como funciona</h2>
+
+    <div class="tabs-nav">
+      <button class="tab-btn active" onclick="switchTab('user', this)">👤 Para o usuário</button>
+      <button class="tab-btn" onclick="switchTab('tech', this)">⚙️ Por dentro do sistema</button>
+    </div>
+
+    <!-- TAB: USUÁRIO -->
+    <div id="tab-user" class="tab-panel active">
+
+      <div class="features-grid" style="margin-bottom:48px">
+
+        <div class="feat-card">
+          <div class="feat-icon">📋</div>
+          <div class="feat-body">
+            <h4>Lista de Objetos</h4>
+            <p>Cadastre compostos, espécies, genes ou qualquer entidade de interesse, com categorias, subcategorias e sinônimos. Importe de CSV com um clique.</p>
+          </div>
+        </div>
+
+        <div class="feat-card">
+          <div class="feat-icon">🔍</div>
+          <div class="feat-body">
+            <h4>Mineração de Artigos</h4>
+            <p>Adicione artigos em PDF ou cole o texto manualmente. O scanner detecta automaticamente quais objetos aparecem em cada artigo.</p>
+          </div>
+        </div>
+
+        <div class="feat-card">
+          <div class="feat-icon">📊</div>
+          <div class="feat-body">
+            <h4>Visualizações Interativas</h4>
+            <p>Gere gráficos de barras, linhas, dispersão, mapas de calor e pizza diretamente dos seus dados. Exportáveis em alta resolução.</p>
+          </div>
+        </div>
+
+        <div class="feat-card">
+          <div class="feat-icon">🗃️</div>
+          <div class="feat-body">
+            <h4>Compilador de Dados</h4>
+            <p>Organize dados quantitativos de revisões sistemáticas (LC50, EC50, IC50…). Padronize nomes de parâmetros e monte tabelas de síntese.</p>
+          </div>
+        </div>
+
+        <div class="feat-card">
+          <div class="feat-icon">💾</div>
+          <div class="feat-body">
+            <h4>Projetos Portáteis</h4>
+            <p>Tudo salvo em um único arquivo <code>.sldm</code> (SQLite). Fácil de compartilhar, fazer backup ou migrar entre computadores.</p>
+          </div>
+        </div>
+
+        <div class="feat-card">
+          <div class="feat-icon">📝</div>
+          <div class="feat-body">
+            <h4>Editor CSV Integrado</h4>
+            <p>Visualize e edite tabelas de dados diretamente no app, sem precisar abrir planilhas externas. Ideal para ajustes rápidos.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <h3 style="font-size:1.2rem;margin-bottom:28px">Fluxo típico de uso</h3>
+      <div class="workflow">
+        <div class="wf-step">
+          <div class="wf-num">1</div>
+          <div class="wf-body">
+            <h4>Crie um projeto</h4>
+            <p>Abra o SLDM e crie um novo projeto. Um arquivo <code>.sldm</code> será gerado — ele guarda tudo.</p>
+          </div>
+        </div>
+        <div class="wf-step">
+          <div class="wf-num">2</div>
+          <div class="wf-body">
+            <h4>Cadastre seus objetos de interesse</h4>
+            <p>Na aba <em>Object List</em>, adicione compostos, espécies ou genes. Inclua sinônimos para melhorar a detecção automática.</p>
+          </div>
+        </div>
+        <div class="wf-step">
+          <div class="wf-num">3</div>
+          <div class="wf-body">
+            <h4>Importe seus artigos</h4>
+            <p>Na aba <em>Article Mining</em>, adicione PDFs ou cole os textos. Use o botão <em>Scan</em> para detectar automaticamente quais objetos aparecem.</p>
+          </div>
+        </div>
+        <div class="wf-step">
+          <div class="wf-num">4</div>
+          <div class="wf-body">
+            <h4>Compile os dados quantitativos</h4>
+            <p>No <em>Data Compiler</em>, insira os valores extraídos dos artigos (doses, concentrações, etc.) e monte tabelas de revisão.</p>
+          </div>
+        </div>
+        <div class="wf-step">
+          <div class="wf-num">5</div>
+          <div class="wf-body">
+            <h4>Gere visualizações</h4>
+            <p>Na aba <em>Visualization</em>, escolha o tipo de gráfico, configure os eixos e exporte a imagem pronta para o seu artigo.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CSV INSTRUCTIONS -->
+      <div style="margin-top:56px">
+        <h3 style="font-size:1.2rem;margin-bottom:8px">Importando dados via CSV</h3>
+        <p style="font-size:.95rem;color:var(--ink-2);line-height:1.7;max-width:680px;margin-bottom:32px">
+          O SLDM aceita importação em formato <code>.csv</code> para agilizar o cadastro em massa de objetos e dados de revisão.
+          Abaixo estão as especificações de cada arquivo suportado.
+        </p>
+
+        <div style="display:flex;flex-direction:column;gap:20px;max-width:860px">
+
+          <!-- CSV de Objetos -->
+          <div style="background:var(--cream);border:1px solid var(--border);border-radius:var(--r);overflow:hidden">
+            <div style="padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
+              <div style="background:var(--lavender);width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">📋</div>
+              <div>
+                <div style="font-weight:500;font-size:.95rem">CSV de Objetos</div>
+                <div style="font-size:.75rem;color:var(--ink-3);font-family:'DM Mono',monospace;margin-top:2px">File → Import Objects CSV · ou aba Object List</div>
+              </div>
+            </div>
+            <div style="padding:20px 24px">
+              <p style="font-size:.875rem;color:var(--ink-2);line-height:1.65;margin-bottom:16px">
+                Use este arquivo para cadastrar os objetos que o SLDM irá rastrear nos artigos. Cada linha representa um objeto distinto.
+                Os campos <strong>object</strong> e <strong>category</strong> são obrigatórios; os demais são opcionais, mas fortemente recomendados
+                para melhorar a precisão da detecção automática.
+              </p>
+              <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;margin-bottom:16px">
+                <div style="padding:7px 16px;background:rgba(28,28,30,.03);border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:.7rem;color:var(--ink-3)">cabeçalho esperado</div>
+                <div style="padding:12px 16px;font-family:'DM Mono',monospace;font-size:.82rem;color:var(--ink-2);overflow-x:auto;white-space:nowrap">object, category, subcategory, synonyms, notes</div>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px">
+                <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px">
+                  <div style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--lavender-d);margin-bottom:5px">object <span style="color:var(--rose-d);font-size:.65rem">obrigatório</span></div>
+                  <div style="font-size:.8rem;color:var(--ink-2);line-height:1.5">Nome principal do objeto. Será o identificador usado em todo o sistema.</div>
+                </div>
+                <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px">
+                  <div style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--lavender-d);margin-bottom:5px">category <span style="color:var(--rose-d);font-size:.65rem">obrigatório</span></div>
+                  <div style="font-size:.8rem;color:var(--ink-2);line-height:1.5">Classificação ampla do objeto. Usada para filtrar e agrupar nos módulos de análise.</div>
+                </div>
+                <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px">
+                  <div style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--sky-d);margin-bottom:5px">subcategory</div>
+                  <div style="font-size:.8rem;color:var(--ink-2);line-height:1.5">Subdivisão dentro da categoria. Permite granularidade adicional na organização.</div>
+                </div>
+                <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px">
+                  <div style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--sky-d);margin-bottom:5px">synonyms</div>
+                  <div style="font-size:.8rem;color:var(--ink-2);line-height:1.5">Nomes alternativos, separados por vírgula dentro de aspas duplas. Ampliam o reconhecimento nos textos.</div>
+                </div>
+                <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px">
+                  <div style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--sky-d);margin-bottom:5px">notes</div>
+                  <div style="font-size:.8rem;color:var(--ink-2);line-height:1.5">Campo livre para anotações internas. Não afeta a mineração.</div>
+                </div>
+              </div>
+              <p style="font-size:.78rem;color:var(--ink-3);margin-top:14px;font-style:italic">
+                ⚠ Sinônimos que contêm vírgula devem estar entre aspas duplas no CSV: <span style="font-family:'DM Mono',monospace">"nome A, nome B"</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- CSV de Dados de Revisão -->
+          <div style="background:var(--cream);border:1px solid var(--border);border-radius:var(--r);overflow:hidden">
+            <div style="padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
+              <div style="background:var(--mint);width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">🗃️</div>
+              <div>
+                <div style="font-weight:500;font-size:.95rem">CSV de Dados de Revisão</div>
+                <div style="font-size:.75rem;color:var(--ink-3);font-family:'DM Mono',monospace;margin-top:2px">Aba Data Compiler</div>
+              </div>
+            </div>
+            <div style="padding:20px 24px">
+              <p style="font-size:.875rem;color:var(--ink-2);line-height:1.65;margin-bottom:16px">
+                Use este arquivo para importar dados quantitativos extraídos dos artigos — como valores de toxicidade, doses, concentrações
+                ou qualquer parâmetro numérico da sua revisão. Cada linha representa uma medição de um parâmetro para um objeto em um artigo específico.
+              </p>
+              <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;margin-bottom:16px">
+                <div style="padding:7px 16px;background:rgba(28,28,30,.03);border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:.7rem;color:var(--ink-3)">cabeçalho esperado</div>
+                <div style="padding:12px 16px;font-family:'DM Mono',monospace;font-size:.82rem;color:var(--ink-2);overflow-x:auto;white-space:nowrap">object, parameter, value, unit, species, article, notes</div>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px">
+                <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px">
+                  <div style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--mint-d);margin-bottom:5px">object <span style="color:var(--rose-d);font-size:.65rem">obrigatório</span></div>
+                  <div style="font-size:.8rem;color:var(--ink-2);line-height:1.5">Nome do objeto conforme cadastrado na Object List. Deve haver correspondência exata.</div>
+                </div>
+                <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px">
+                  <div style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--mint-d);margin-bottom:5px">parameter <span style="color:var(--rose-d);font-size:.65rem">obrigatório</span></div>
+                  <div style="font-size:.8rem;color:var(--ink-2);line-height:1.5">Nome do parâmetro medido. O Data Compiler permite padronizar variantes de um mesmo parâmetro.</div>
+                </div>
+                <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px">
+                  <div style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--mint-d);margin-bottom:5px">value <span style="color:var(--rose-d);font-size:.65rem">obrigatório</span></div>
+                  <div style="font-size:.8rem;color:var(--ink-2);line-height:1.5">Valor numérico da medição. Use ponto como separador decimal.</div>
+                </div>
+                <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px">
+                  <div style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--amber-d);margin-bottom:5px">unit</div>
+                  <div style="font-size:.8rem;color:var(--ink-2);line-height:1.5">Unidade da medição. Recomendado para consistência nas visualizações.</div>
+                </div>
+                <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px">
+                  <div style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--amber-d);margin-bottom:5px">species</div>
+                  <div style="font-size:.8rem;color:var(--ink-2);line-height:1.5">Organismo ou modelo de estudo. Útil para filtros e agrupamentos nos gráficos.</div>
+                </div>
+                <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px">
+                  <div style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--amber-d);margin-bottom:5px">article</div>
+                  <div style="font-size:.8rem;color:var(--ink-2);line-height:1.5">Referência ao artigo de origem. Permite rastrear de onde cada valor foi extraído.</div>
+                </div>
+                <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px">
+                  <div style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--amber-d);margin-bottom:5px">notes</div>
+                  <div style="font-size:.8rem;color:var(--ink-2);line-height:1.5">Campo livre para observações sobre a medição ou condições experimentais.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /tab-user -->
+
+    <!-- TAB: TÉCNICO -->
+    <div id="tab-tech" class="tab-panel">
+      <div class="tech-grid">
+
+        <div class="tech-block">
+          <h4>Interface gráfica</h4>
+          <p>O SLDM usa <strong>PyQt5</strong> como framework de UI, com uma janela principal baseada em abas (<code>QTabWidget</code>). O tema visual é aplicado globalmente via QSS (Qt Style Sheets), garantindo aparência consistente.</p>
+          <div class="pill-list">
+            <span class="pill">PyQt5</span>
+            <span class="pill">QTabWidget</span>
+            <span class="pill">QSS</span>
+            <span class="pill">Qt5</span>
+          </div>
+        </div>
+
+        <div class="tech-block">
+          <h4>Banco de dados</h4>
+          <p>Todos os dados — artigos, objetos, parâmetros e revisões — são armazenados em um banco <strong>SQLite</strong> embutido no arquivo <code>.sldm</code>. A camada de acesso (<code>database.py</code>) abstrai todas as queries.</p>
+          <div class="pill-list">
+            <span class="pill">SQLite</span>
+            <span class="pill">sqlite3</span>
+            <span class="pill">arquivo único</span>
+          </div>
+        </div>
+
+        <div class="tech-block">
+          <h4>Extração de texto & mineração</h4>
+          <p>PDFs são processados via <strong>PyMuPDF (fitz)</strong>, que extrai o texto bruto de cada página. O scanner percorre o texto buscando os objetos cadastrados e seus sinônimos usando correspondência por regex normalizada.</p>
+          <div class="pill-list">
+            <span class="pill">PyMuPDF</span>
+            <span class="pill">fitz</span>
+            <span class="pill">regex</span>
+            <span class="pill">NLP básico</span>
+          </div>
+        </div>
+
+        <div class="tech-block">
+          <h4>Visualização de dados</h4>
+          <p>Os gráficos são renderizados com <strong>Matplotlib</strong> embutido no PyQt via <code>FigureCanvasQTAgg</code>. O <strong>Pandas</strong> gerencia os DataFrames intermediários usados para agregar e pivotear os dados antes da plotagem.</p>
+          <div class="pill-list">
+            <span class="pill">Matplotlib</span>
+            <span class="pill">FigureCanvasQTAgg</span>
+            <span class="pill">Pandas</span>
+            <span class="pill">DataFrame</span>
+          </div>
+        </div>
+
+        <div class="arch-diagram">
+          <h4>Arquitetura do sistema</h4>
+          <div class="arch-flow">
+            <div class="arch-box">
+              <span class="arch-label">entrada</span>
+              <span class="arch-name">PDF / CSV / texto</span>
+            </div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-box">
+              <span class="arch-label">extração</span>
+              <span class="arch-name">PyMuPDF</span>
+            </div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-box">
+              <span class="arch-label">persistência</span>
+              <span class="arch-name">SQLite .sldm</span>
+            </div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-box">
+              <span class="arch-label">análise</span>
+              <span class="arch-name">Pandas</span>
+            </div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-box">
+              <span class="arch-label">saída</span>
+              <span class="arch-name">Matplotlib / UI</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════ SCREENSHOTS ════════════════════════════ -->
+<section id="screenshots">
+  <div class="section-inner">
+    <p class="section-label">Interface</p>
+    <h2 class="section-title">Veja o SLDM em ação</h2>
+    <p class="section-lead">
+      Capturas da interface em uso real. Substitua as imagens abaixo pelas suas próprias.
+    </p>
+
+    <div class="screenshots-grid">
+
+      <div class="shot-card">
+        <div class="shot-img">
+          <span class="shot-icon">📋</span>
+          Captura aqui<br/>
+          <span style="font-size:.68rem">Sugestão: aba Object List com objetos cadastrados</span>
+        </div>
+        <div class="shot-caption">Lista de Objetos</div>
+        <div class="shot-sub">Cadastro de compostos com categorias e sinônimos</div>
+      </div>
+
+      <div class="shot-card">
+        <div class="shot-img">
+          <span class="shot-icon">🔍</span>
+          Captura aqui<br/>
+          <span style="font-size:.68rem">Sugestão: aba Article Mining com PDFs carregados</span>
+        </div>
+        <div class="shot-caption">Mineração de Artigos</div>
+        <div class="shot-sub">Detecção automática de objetos nos textos</div>
+      </div>
+
+      <div class="shot-card">
+        <div class="shot-img">
+          <span class="shot-icon">📊</span>
+          Captura aqui<br/>
+          <span style="font-size:.68rem">Sugestão: aba Visualization com gráfico gerado</span>
+        </div>
+        <div class="shot-caption">Visualizações</div>
+        <div class="shot-sub">Dashboard e gráficos exportáveis</div>
+      </div>
+
+      <div class="shot-card">
+        <div class="shot-img">
+          <span class="shot-icon">🗃️</span>
+          Captura aqui<br/>
+          <span style="font-size:.68rem">Sugestão: aba Data Compiler com tabela de LC50</span>
+        </div>
+        <div class="shot-caption">Compilador de Dados</div>
+        <div class="shot-sub">Tabelas de revisão com padronização de parâmetros</div>
+      </div>
+
+      <div class="shot-card">
+        <div class="shot-img">
+          <span class="shot-icon">📝</span>
+          Captura aqui<br/>
+          <span style="font-size:.68rem">Sugestão: editor CSV aberto com dados</span>
+        </div>
+        <div class="shot-caption">Editor CSV</div>
+        <div class="shot-sub">Edição de tabelas sem sair do app</div>
+      </div>
+
+      <div class="shot-card">
+        <div class="shot-img">
+          <span class="shot-icon">💾</span>
+          Captura aqui<br/>
+          <span style="font-size:.68rem">Sugestão: explorador de arquivos .sldm ou tela de export</span>
+        </div>
+        <div class="shot-caption">Projetos Portáteis</div>
+        <div class="shot-sub">Arquivo único .sldm com todo o projeto</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════ SOBRE / REGISTRO ════════════════════════════ -->
+<section id="about">
+  <div class="section-inner">
+    <div class="about-grid">
+
+      <div class="about-text">
+        <p class="section-label">Sobre o projeto</p>
+        <h2 class="section-title" style="margin-bottom:24px">SLDM</h2>
+
+        <p>O SLDM nasceu da necessidade prática de organizar grandes volumes de literatura científica em revisões sistemáticas de toxicologia e ecotoxicologia, onde identificar manualmente a presença de centenas de compostos em dezenas de artigos é um processo lento e sujeito a erros.</p>
+
+        <p>O software foi desenvolvido integralmente em Python, com foco em usabilidade para pesquisadores sem formação técnica em programação. A interface foi projetada para refletir o fluxo natural de uma revisão bibliográfica: cadastrar → minerar → compilar → visualizar.</p>
+
+        <p>Distribuído como executável independente, sem necessidade de configuração de ambiente, o SLDM pode ser usado imediatamente em qualquer computador Windows — e potencialmente em Linux e macOS.</p>
+      </div>
+
+      <div>
+        <div class="registro-card">
+          <h3>Registro de Software</h3>
+          <p class="reg-sub">Proteção legal · Lei nº 9.609/1998 (Brasil)</p>
+
+          <div class="reg-row">
+            <span class="reg-key">Nome</span>
+            <span class="reg-val">SLDM</span>
+          </div>
+          <div class="reg-row">
+            <span class="reg-key">Nome completo</span>
+            <span class="reg-val" style="font-size:.75rem">Scientific Literature Data Miner</span>
+          </div>
+          <div class="reg-row">
+            <span class="reg-key">Versão</span>
+            <span class="reg-val">1.0.0</span>
+          </div>
+          <div class="reg-row">
+            <span class="reg-key">Linguagem</span>
+            <span class="reg-val">Python 3</span>
+          </div>
+          <div class="reg-row">
+            <span class="reg-key">Órgão de registro</span>
+            <span class="reg-val">##</span>
+          </div>
+          <div class="reg-row">
+            <span class="reg-key">Número de registro</span>
+            <span class="reg-pending">## a preencher</span>
+          </div>
+          <div class="reg-row">
+            <span class="reg-key">Data de registro</span>
+            <span class="reg-pending">## a preencher</span>
+          </div>
+          <div class="reg-row">
+            <span class="reg-key">Titular dos direitos</span>
+            <span class="reg-val">##</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════ FOOTER ════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">
+      <span>S</span>LDM — Scientific Literature Data Miner
+    </div>
+    <div class="footer-copy">© 2026 SLDM Project · v1.0.0</div>
+    <div class="footer-links">
+      <a href="https://github.com/##/scientific-literature-data-mining" target="_blank">GitHub</a>
+      <a href="#about">Sobre</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ════════════════════════════ JS ════════════════════════════ -->
+<script>
+  /* ── navbar scroll ── */
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 20);
+  });
+
+  /* ── tabs ── */
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  /* ── network canvas ── */
+  (function () {
+    const canvas = document.getElementById('network-canvas');
+    const ctx    = canvas.getContext('2d');
+
+    const COLORS = [
+      '#F2A7B0', // rose
+      '#A8D4F5', // sky
+      '#A8E6CF', // mint
+      '#F5D190', // amber
+      '#C5B8F0', // lavender
+      '#F5C4A1', // peach
+    ];
+
+    let W, H, nodes = [], mouse = { x: -999, y: -999 };
+    const N_NODES   = 52;
+    const MAX_DIST  = 160;
+    const MOUSE_R   = 120;
+
+    function resize() {
+      W = canvas.width  = canvas.offsetWidth;
+      H = canvas.height = canvas.offsetHeight;
+    }
+
+    function mkNode() {
+      const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+      return {
+        x:  Math.random() * W,
+        y:  Math.random() * H,
+        vx: (Math.random() - .5) * .45,
+        vy: (Math.random() - .5) * .45,
+        r:  Math.random() * 3.5 + 2.5,
+        color,
+        alpha: Math.random() * .5 + .5,
+      };
+    }
+
+    function init() {
+      resize();
+      nodes = Array.from({ length: N_NODES }, mkNode);
+    }
+
+    function hexToRgb(hex) {
+      const r = parseInt(hex.slice(1,3),16);
+      const g = parseInt(hex.slice(3,5),16);
+      const b = parseInt(hex.slice(5,7),16);
+      return [r, g, b];
+    }
+
+    function lerpColor(c1, c2, t) {
+      const [r1,g1,b1] = hexToRgb(c1);
+      const [r2,g2,b2] = hexToRgb(c2);
+      const r = Math.round(r1 + (r2-r1)*t);
+      const g = Math.round(g1 + (g2-g1)*t);
+      const b = Math.round(b1 + (b2-b1)*t);
+      return `rgb(${r},${g},${b})`;
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+
+      /* edges */
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const a = nodes[i], b = nodes[j];
+          const dx = a.x - b.x, dy = a.y - b.y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          if (dist > MAX_DIST) continue;
+
+          const t   = dist / MAX_DIST;
+          const opa = (1 - t) * .28;
+
+          /* gradient line */
+          const grad = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
+          grad.addColorStop(0, a.color + Math.round(opa*255).toString(16).padStart(2,'0'));
+          grad.addColorStop(1, b.color + Math.round(opa*255).toString(16).padStart(2,'0'));
+
+          ctx.beginPath();
+          ctx.strokeStyle = grad;
+          ctx.lineWidth   = .8 + (1-t) * .6;
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+        }
+      }
+
+      /* nodes */
+      nodes.forEach(n => {
+        const dx = n.x - mouse.x, dy = n.y - mouse.y;
+        const md = Math.sqrt(dx*dx+dy*dy);
+        const boost = md < MOUSE_R ? 1.4 : 1;
+
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r * boost, 0, Math.PI * 2);
+        ctx.fillStyle = n.color + Math.round(n.alpha * 255).toString(16).padStart(2,'0');
+        ctx.fill();
+
+        /* soft glow */
+        const glow = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r * 4 * boost);
+        glow.addColorStop(0, n.color + '22');
+        glow.addColorStop(1, n.color + '00');
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r * 4 * boost, 0, Math.PI * 2);
+        ctx.fillStyle = glow;
+        ctx.fill();
+      });
+    }
+
+    function update() {
+      nodes.forEach(n => {
+        n.x += n.vx;
+        n.y += n.vy;
+        if (n.x < -20)  { n.x = W + 20; }
+        if (n.x > W+20) { n.x = -20; }
+        if (n.y < -20)  { n.y = H + 20; }
+        if (n.y > H+20) { n.y = -20; }
+      });
+    }
+
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    canvas.addEventListener('mousemove', e => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+    });
+    canvas.addEventListener('mouseleave', () => {
+      mouse.x = -999; mouse.y = -999;
+    });
+
+    window.addEventListener('resize', () => { resize(); });
+
+    init();
+    loop();
+  })();
+</script>
+</body>
+</html>

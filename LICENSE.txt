@@ -1,0 +1,30 @@
+LICENÇA DE USO DE SOFTWARE
+
+Scientific Literature Data Miner (SLDM) — Versão 1.0.0
+
+Copyright © 2026 SLDM Project
+Todos os direitos reservados.
+
+Este software é protegido pela Lei de Software do Brasil (Lei nº 9.609/1998)
+e pela Lei de Direitos Autorais (Lei nº 9.610/1998).
+
+TERMOS DE USO:
+
+1. CONCESSÃO DE LICENÇA
+   É concedida ao usuário uma licença pessoal, intransferível e não exclusiva
+   para instalar e utilizar este software.
+
+2. RESTRIÇÕES
+   É proibido: copiar, modificar, distribuir, sublicenciar, vender ou
+   realizar engenharia reversa deste software sem autorização prévia e
+   expressa do detentor dos direitos.
+
+3. ISENÇÃO DE GARANTIA
+   Este software é fornecido "no estado em que se encontra", sem garantias
+   expressas ou implícitas.
+
+4. LIMITAÇÃO DE RESPONSABILIDADE
+   O autor não será responsável por danos diretos, indiretos, incidentais
+   ou consequenciais decorrentes do uso ou impossibilidade de uso do software.
+
+Para licenciamento comercial ou institucional, entre em contato com o autor.
