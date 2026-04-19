@@ -25,6 +25,8 @@
       --rose: #F2A7B0;
       --rose-d: #C97080;
       --peach: #F5C4A1;
+      --teal: #A0E0DC;
+      --teal-d: #3AAFA9;
       --border: rgba(28,28,30,.08);
       --shadow: 0 4px 24px rgba(28,28,30,.07);
       --shadow-lg: 0 12px 48px rgba(28,28,30,.11);
@@ -111,10 +113,11 @@
     .feat-icon { width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
     .feat-card:nth-child(1) .feat-icon { background: var(--lavender); }
     .feat-card:nth-child(2) .feat-icon { background: var(--sky); }
-    .feat-card:nth-child(3) .feat-icon { background: var(--mint); }
-    .feat-card:nth-child(4) .feat-icon { background: var(--amber); }
-    .feat-card:nth-child(5) .feat-icon { background: var(--rose); }
-    .feat-card:nth-child(6) .feat-icon { background: var(--peach); }
+    .feat-card:nth-child(3) .feat-icon { background: var(--teal); }
+    .feat-card:nth-child(4) .feat-icon { background: var(--mint); }
+    .feat-card:nth-child(5) .feat-icon { background: var(--amber); }
+    .feat-card:nth-child(6) .feat-icon { background: var(--rose); }
+    .feat-card:nth-child(7) .feat-icon { background: var(--peach); }
     .feat-body h4 { font-size: 1rem; margin-bottom: 6px; }
     .feat-body p { font-size: .875rem; color: var(--ink-2); line-height: 1.6; }
 
@@ -127,6 +130,7 @@
     .wf-step:nth-child(3) .wf-num { border-color: var(--mint); color: var(--mint-d); }
     .wf-step:nth-child(4) .wf-num { border-color: var(--amber); color: var(--amber-d); }
     .wf-step:nth-child(5) .wf-num { border-color: var(--rose); color: var(--rose-d); }
+    .wf-step:nth-child(6) .wf-num { border-color: var(--teal); color: var(--teal-d); }
     .wf-body { padding: 8px 0 36px; }
     .wf-body h4 { font-size: 1rem; margin-bottom: 5px; }
     .wf-body p { font-size: .875rem; color: var(--ink-2); line-height: 1.6; }
@@ -243,13 +247,13 @@
     <div class="hero-tag">v1.0.0 · Scientific Software</div>
     <h1 class="hero-title">Scientific<br/><em>Literature</em><br/>Data Miner</h1>
     <p class="hero-sub">SLDM — Scientific Literature Data Mining</p>
-    <p class="hero-desc">A desktop tool to organize scientific articles, automatically identify compounds, species and parameters of interest, and generate publication-ready exploratory visualizations.</p>
+    <p class="hero-desc">A desktop tool to organize scientific articles, automatically identify compounds, species and parameters of interest, search across your library, and generate publication-ready exploratory visualizations.</p>
     <div class="hero-actions">
       <a href="https://github.com/jvictorborsatto/Scientific-Literature-Data-Mining/releases/download/SLDM/SLDM.zip" class="btn btn-primary">↓ Download for Windows</a>
       <a href="#how" class="btn btn-ghost">How it works →</a>
     </div>
     <div class="hero-stats">
-      <div><div class="stat-val">4</div><div class="stat-lbl">Integrated modules</div></div>
+      <div><div class="stat-val">5</div><div class="stat-lbl">Integrated modules</div></div>
       <div><div class="stat-val">Python</div><div class="stat-lbl">Open source</div></div>
       <div><div class="stat-val">.sldm</div><div class="stat-lbl">Single portable file</div></div>
     </div>
@@ -298,12 +302,16 @@
           <div class="feat-body"><h4>Article Mining</h4><p>Add articles as PDF or paste text manually. The scanner automatically detects which objects appear in each article.</p></div>
         </div>
         <div class="feat-card">
-          <div class="feat-icon">📊</div>
-          <div class="feat-body"><h4>Interactive Visualizations</h4><p>Generate bar charts, line plots, scatter plots, heatmaps and pie charts from your data. Exportable in high resolution.</p></div>
+          <div class="feat-icon">🔎</div>
+          <div class="feat-body"><h4>Search</h4><p>Cross-search any word, phrase or object name across your entire imported article library. Results open with each matched term highlighted in its own colour directly in the PDF viewer.</p></div>
         </div>
         <div class="feat-card">
-          <div class="feat-icon">🗃️</div>
-          <div class="feat-body"><h4>Data Compiler</h4><p>Organize quantitative data from systematic reviews (LC50, EC50, IC50…). Standardize parameter names and build synthesis tables.</p></div>
+          <div class="feat-icon">📊</div>
+          <div class="feat-body"><h4>Visualization</h4><p>Generate bar charts, line plots, scatter plots, heatmaps and pie charts from your data. Exportable in high resolution.</p></div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">🗂️</div>
+          <div class="feat-body"><h4>Combine</h4><p>Cross-analyze co-occurrences between objects across articles. Build connection maps, compare object groups, and generate synthesis tables — with lazy loading and stale-aware refresh.</p></div>
         </div>
         <div class="feat-card">
           <div class="feat-icon">💾</div>
@@ -320,8 +328,9 @@
         <div class="wf-step"><div class="wf-num">1</div><div class="wf-body"><h4>Create a project</h4><p>Open SLDM and create a new project. A <code>.sldm</code> file will be created — it stores everything.</p></div></div>
         <div class="wf-step"><div class="wf-num">2</div><div class="wf-body"><h4>Register your objects of interest</h4><p>In the <em>Object List</em> tab, add compounds, species or genes. Include synonyms to improve automatic detection.</p></div></div>
         <div class="wf-step"><div class="wf-num">3</div><div class="wf-body"><h4>Import your articles</h4><p>In the <em>Article Mining</em> tab, add PDFs or paste texts. Use <em>Scan</em> to automatically detect which objects appear.</p></div></div>
-        <div class="wf-step"><div class="wf-num">4</div><div class="wf-body"><h4>Compile quantitative data</h4><p>In <em>Data Compiler</em>, enter values extracted from articles (doses, concentrations, etc.) and build review tables.</p></div></div>
-        <div class="wf-step"><div class="wf-num">5</div><div class="wf-body"><h4>Generate visualizations</h4><p>In the <em>Visualization</em> tab, choose the chart type, configure axes and export the image ready for your paper.</p></div></div>
+        <div class="wf-step"><div class="wf-num">4</div><div class="wf-body"><h4>Search across your library</h4><p>In the <em>Search</em> tab, type any word or phrase and find which articles contain it — with AND/OR logic between terms. Click any result to open the PDF with highlights.</p></div></div>
+        <div class="wf-step"><div class="wf-num">5</div><div class="wf-body"><h4>Combine and cross-analyze</h4><p>In <em>Combine</em>, explore co-occurrences between objects, build connection maps and comparison tables across your article collection.</p></div></div>
+        <div class="wf-step"><div class="wf-num">6</div><div class="wf-body"><h4>Generate visualizations</h4><p>In the <em>Visualization</em> tab, choose the chart type, configure axes and export the image ready for your paper.</p></div></div>
       </div>
 
       <div style="margin-top:56px">
@@ -344,23 +353,6 @@
               </div>
             </div>
           </div>
-          <div class="csv-block">
-            <div class="csv-header">
-              <div class="csv-icon" style="background:var(--mint)">🗃️</div>
-              <div><div style="font-weight:500;font-size:.95rem">Review Data CSV</div><div style="font-size:.75rem;color:var(--ink-3);font-family:'DM Mono',monospace;margin-top:2px">Data Compiler</div></div>
-            </div>
-            <div class="csv-body">
-              <div class="csv-schema"><div class="csv-schema-lbl">expected header</div><div class="csv-schema-val">object, parameter, value, unit, species, article, notes</div></div>
-              <div class="csv-fields">
-                <div class="csv-field"><div class="csv-fname" style="color:var(--mint-d)">object <span class="req">required</span></div><div class="csv-fdesc">Must match exactly the name in the Object List.</div></div>
-                <div class="csv-field"><div class="csv-fname" style="color:var(--mint-d)">parameter <span class="req">required</span></div><div class="csv-fdesc">Measured parameter name (e.g. LC50, EC50).</div></div>
-                <div class="csv-field"><div class="csv-fname" style="color:var(--mint-d)">value <span class="req">required</span></div><div class="csv-fdesc">Numeric value. Use dot as decimal separator.</div></div>
-                <div class="csv-field"><div class="csv-fname" style="color:var(--amber-d)">unit</div><div class="csv-fdesc">Measurement unit.</div></div>
-                <div class="csv-field"><div class="csv-fname" style="color:var(--amber-d)">species</div><div class="csv-fdesc">Organism or study model.</div></div>
-                <div class="csv-field"><div class="csv-fname" style="color:var(--amber-d)">article</div><div class="csv-fdesc">Source article reference.</div></div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -369,7 +361,7 @@
       <div class="tech-grid">
         <div class="tech-block"><h4>Graphical interface</h4><p>SLDM uses <strong>PyQt5</strong> as its UI framework, with a tab-based main window (<code>QTabWidget</code>). The visual theme is applied globally via QSS.</p><div class="pill-list"><span class="pill">PyQt5</span><span class="pill">QTabWidget</span><span class="pill">QSS</span></div></div>
         <div class="tech-block"><h4>Database</h4><p>All data is stored in a <strong>SQLite</strong> database embedded in the <code>.sldm</code> file. The access layer (<code>database.py</code>) abstracts all queries.</p><div class="pill-list"><span class="pill">SQLite</span><span class="pill">sqlite3</span></div></div>
-        <div class="tech-block"><h4>Text extraction &amp; mining</h4><p>PDFs are processed via <strong>PyMuPDF (fitz)</strong>. The scanner finds registered objects and synonyms using normalised regex matching.</p><div class="pill-list"><span class="pill">PyMuPDF</span><span class="pill">fitz</span><span class="pill">regex</span></div></div>
+        <div class="tech-block"><h4>Text extraction &amp; mining</h4><p>PDFs are processed via <strong>PyMuPDF (fitz)</strong>. The scanner finds registered objects and synonyms using normalised regex matching. The Search module uses the same engine with per-term colour-coded highlighting.</p><div class="pill-list"><span class="pill">PyMuPDF</span><span class="pill">fitz</span><span class="pill">regex</span></div></div>
         <div class="tech-block"><h4>Data visualization</h4><p>Charts rendered with <strong>Matplotlib</strong> embedded via <code>FigureCanvasQTAgg</code>. <strong>Pandas</strong> manages intermediate DataFrames.</p><div class="pill-list"><span class="pill">Matplotlib</span><span class="pill">Pandas</span><span class="pill">FigureCanvasQTAgg</span></div></div>
         <div class="arch-diagram">
           <h4>System architecture</h4>
@@ -380,7 +372,7 @@
             <span class="arch-arrow">→</span>
             <div class="arch-box"><span class="arch-label">persistence</span><span class="arch-name">SQLite .sldm</span></div>
             <span class="arch-arrow">→</span>
-            <div class="arch-box"><span class="arch-label">analysis</span><span class="arch-name">Pandas</span></div>
+            <div class="arch-box"><span class="arch-label">analysis</span><span class="arch-name">Pandas + Search</span></div>
             <span class="arch-arrow">→</span>
             <div class="arch-box"><span class="arch-label">output</span><span class="arch-name">Matplotlib / UI</span></div>
           </div>
@@ -394,15 +386,17 @@
   <div class="section-inner">
     <p class="section-label">User Guide</p>
     <h2 class="section-title">How to use each tab</h2>
-    <p class="section-lead">SLDM is organized in four main tabs. Click a tab below to see step-by-step instructions and tips.</p>
+    <p class="section-lead">SLDM is organized in five main tabs. Click a tab below to see step-by-step instructions and tips.</p>
 
     <div class="module-tabs">
       <button class="mod-btn active" onclick="switchMod('objects', this)"><span class="m-icon">📋</span><span class="m-name">Object List</span></button>
       <button class="mod-btn" onclick="switchMod('mining', this)"><span class="m-icon">🔍</span><span class="m-name">Article Mining</span></button>
+      <button class="mod-btn" onclick="switchMod('search', this)"><span class="m-icon">🔎</span><span class="m-name">Search</span></button>
       <button class="mod-btn" onclick="switchMod('viz', this)"><span class="m-icon">📊</span><span class="m-name">Visualization</span></button>
-      <button class="mod-btn" onclick="switchMod('compiler', this)"><span class="m-icon">🗃️</span><span class="m-name">Data Compiler</span></button>
+      <button class="mod-btn" onclick="switchMod('combine', this)"><span class="m-icon">🗂️</span><span class="m-name">Combine</span></button>
     </div>
 
+    <!-- OBJECT LIST -->
     <div id="mod-objects" class="mod-panel active">
       <div class="mod-content">
         <div class="mod-left">
@@ -411,7 +405,7 @@
           <div class="mod-steps">
             <div class="mod-step"><div class="mod-step-num" style="background:var(--lavender-d)">1</div><div><strong>Add objects manually or via CSV</strong><p>Click <em>Add Object</em> to create a new entry with name, category, and optionally subcategory. Or go to <em>File → Import Objects CSV</em> to load multiple objects at once.</p></div></div>
             <div class="mod-step"><div class="mod-step-num" style="background:var(--lavender-d)">2</div><div><strong>Add synonyms to improve detection</strong><p>Select any object and click <em>Edit</em>. In the synonyms field, add alternative names separated by comma (e.g. <code>ATZ, 2-chloro-4-ethylamine</code>). SLDM uses all synonyms during scanning.</p></div></div>
-            <div class="mod-step"><div class="mod-step-num" style="background:var(--lavender-d)">3</div><div><strong>Organize with categories</strong><p>Use consistent category names (e.g. <code>pesticide</code>, <code>drug</code>, <code>species</code>). Categories are used later to filter and group results in the Visualization and Compiler modules.</p></div></div>
+            <div class="mod-step"><div class="mod-step-num" style="background:var(--lavender-d)">3</div><div><strong>Organize with categories</strong><p>Use consistent category names (e.g. <code>pesticide</code>, <code>drug</code>, <code>species</code>). Categories are used later to filter and group results in the Visualization and Combine modules.</p></div></div>
             <div class="mod-step"><div class="mod-step-num" style="background:var(--lavender-d)">4</div><div><strong>Export the list anytime</strong><p>Use <em>File → Export Objects CSV</em> to save a copy. Useful to reuse the same list across different projects.</p></div></div>
           </div>
         </div>
@@ -424,6 +418,7 @@
       </div>
     </div>
 
+    <!-- ARTICLE MINING -->
     <div id="mod-mining" class="mod-panel">
       <div class="mod-content">
         <div class="mod-left">
@@ -445,13 +440,37 @@
       </div>
     </div>
 
+    <!-- SEARCH -->
+    <div id="mod-search" class="mod-panel">
+      <div class="mod-content">
+        <div class="mod-left">
+          <h3>🔎 Search</h3>
+          <p class="mod-desc">A free-text cross-search engine over your entire article library. Type any word, phrase, or object name and find exactly which imported articles contain it — with flexible AND/OR logic between multiple search rows. Results open the PDF with every matched term highlighted in its own distinct colour.</p>
+          <div class="mod-steps">
+            <div class="mod-step"><div class="mod-step-num" style="background:var(--teal-d)">1</div><div><strong>Enter your search terms</strong><p>Type any word or phrase in the search row. Add more rows to combine multiple terms. Choose <em>AND</em> to require all terms, or <em>OR</em> to match any of them.</p></div></div>
+            <div class="mod-step"><div class="mod-step-num" style="background:var(--teal-d)">2</div><div><strong>Toggle case sensitivity</strong><p>Enable the <em>Case-sensitive</em> option when you need exact capitalisation matching (e.g. distinguishing a gene acronym from a common word).</p></div></div>
+            <div class="mod-step"><div class="mod-step-num" style="background:var(--teal-d)">3</div><div><strong>Review the matching articles</strong><p>The results panel lists every article where your terms were found. Each result shows the article title and how many matches were detected.</p></div></div>
+            <div class="mod-step"><div class="mod-step-num" style="background:var(--teal-d)">4</div><div><strong>Open highlighted PDF</strong><p>Click any result to open the built-in PDF viewer. Each search term is highlighted in its own colour across all pages — or the abstract/text if no PDF is attached.</p></div></div>
+          </div>
+        </div>
+        <div class="mod-right">
+          <div class="tips-title">Tips &amp; notes</div>
+          <div class="tip"><strong>Searches imported text only</strong>Search operates on the text already imported into your project — PDFs, pasted abstracts, or raw text. It does not connect to the internet or external databases.</div>
+          <div class="tip"><strong>Up to 10 highlight colours</strong>Each search term gets its own highlight colour in the PDF viewer (up to 10 distinct colours). Overlapping highlights use the last-applied colour.</div>
+          <div class="tip"><strong>Use Search + Mining together</strong>Run Article Mining first to identify which objects are present. Then use Search to dive deeper into specific passages, phrases or data values not covered by your Object List.</div>
+          <div class="tip"><strong>Case-insensitive by default</strong>By default, <code>LC50</code>, <code>lc50</code> and <code>Lc50</code> all match. Enable case-sensitive mode only when capitalisation is meaningful for your query.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISUALIZATION -->
     <div id="mod-viz" class="mod-panel">
       <div class="mod-content">
         <div class="mod-left">
           <h3>📊 Visualization</h3>
           <p class="mod-desc">Build publication-ready charts directly from your project data. Choose the data source, chart type, configure axes and filters, and export in high resolution.</p>
           <div class="mod-steps">
-            <div class="mod-step"><div class="mod-step-num" style="background:var(--mint-d)">1</div><div><strong>Choose the data source</strong><p>Select whether to plot data from <em>Article Mining</em> (citation counts, object co-occurrences) or from <em>Data Compiler</em> (quantitative parameters like LC50, EC50).</p></div></div>
+            <div class="mod-step"><div class="mod-step-num" style="background:var(--mint-d)">1</div><div><strong>Choose the data source</strong><p>Select whether to plot data from <em>Article Mining</em> (citation counts, object co-occurrences) or other compiled data in your project.</p></div></div>
             <div class="mod-step"><div class="mod-step-num" style="background:var(--mint-d)">2</div><div><strong>Select chart type and axes</strong><p>Choose from bar, line, scatter, heatmap or pie. Configure X and Y axes using the available fields — object name, category, parameter, value, year, journal, etc.</p></div></div>
             <div class="mod-step"><div class="mod-step-num" style="background:var(--mint-d)">3</div><div><strong>Apply filters</strong><p>Use the filter panel to restrict the data by category, year range, specific objects or parameters. Changes update the chart preview in real time.</p></div></div>
             <div class="mod-step"><div class="mod-step-num" style="background:var(--mint-d)">4</div><div><strong>Export the chart</strong><p>Click <em>Export</em> to save as PNG or SVG at your desired resolution. Ready for papers, presentations or reports.</p></div></div>
@@ -466,26 +485,28 @@
       </div>
     </div>
 
-    <div id="mod-compiler" class="mod-panel">
+    <!-- COMBINE -->
+    <div id="mod-combine" class="mod-panel">
       <div class="mod-content">
         <div class="mod-left">
-          <h3>🗃️ Data Compiler</h3>
-          <p class="mod-desc">Organize quantitative data extracted from your articles — toxicity values, doses, concentrations, effect measurements. Standardize parameter names, eliminate duplicates, and build synthesis tables ready for statistical analysis.</p>
+          <h3>🗂️ Combine</h3>
+          <p class="mod-desc">Cross-analyze relationships between objects across your entire article collection. Explore co-occurrences, build visual connection maps, compare object groups side by side, and generate synthesis summary tables — all with performance-optimized lazy loading and stale-aware refresh indicators.</p>
           <div class="mod-steps">
-            <div class="mod-step"><div class="mod-step-num" style="background:var(--amber-d)">1</div><div><strong>Add data entries manually or via CSV</strong><p>Click <em>Add Entry</em> and fill in the object, parameter, value, unit, species and source article. Or import a <code>review_data.csv</code> file with multiple records at once.</p></div></div>
-            <div class="mod-step"><div class="mod-step-num" style="background:var(--amber-d)">2</div><div><strong>Standardize parameter names</strong><p>Use the <em>Standardize Parameters</em> tool to merge variants like <code>LC50</code>, <code>LC 50</code> and <code>LC-50</code> into a single canonical name. Always do this before filtering or plotting.</p></div></div>
-            <div class="mod-step"><div class="mod-step-num" style="background:var(--amber-d)">3</div><div><strong>Filter and inspect your data</strong><p>Use the filter panel to show entries for a specific object, parameter, species or article. Edit or delete entries directly in the table.</p></div></div>
-            <div class="mod-step"><div class="mod-step-num" style="background:var(--amber-d)">4</div><div><strong>Export the compiled table</strong><p>Click <em>Export CSV</em> to download the full dataset. The file can be used directly in R, Python or any statistical software.</p></div></div>
+            <div class="mod-step"><div class="mod-step-num" style="background:var(--amber-d)">1</div><div><strong>Build the analysis pool</strong><p>Click <em>Refresh</em> to load the pool of articles and object terms. The pool is built once and cached — it will not rebuild automatically on tab switches, keeping performance fast.</p></div></div>
+            <div class="mod-step"><div class="mod-step-num" style="background:var(--amber-d)">2</div><div><strong>Search co-occurrences</strong><p>Select objects and click <em>Search</em> to find which articles mention them together. Results show frequency counts and the list of matching articles.</p></div></div>
+            <div class="mod-step"><div class="mod-step-num" style="background:var(--amber-d)">3</div><div><strong>Draw a connection map</strong><p>Click <em>Draw Map</em> to generate a visual graph of object relationships. Node size reflects frequency; edges show co-occurrence strength.</p></div></div>
+            <div class="mod-step"><div class="mod-step-num" style="background:var(--amber-d)">4</div><div><strong>Compare groups and export</strong><p>Use the Compare and Summary Table sub-tabs to contrast object groups. A ⚠ stale indicator appears if the pool has changed — click <em>↺ Refresh</em> to update before exporting.</p></div></div>
           </div>
         </div>
         <div class="mod-right">
           <div class="tips-title">Tips &amp; notes</div>
-          <div class="tip"><strong>Standardize before visualizing</strong>Always run parameter standardization before opening the Visualization tab. Inconsistent names will split your data into separate series and produce misleading charts.</div>
-          <div class="tip"><strong>Use the article field for traceability</strong>Fill in the <em>article</em> field consistently for every entry. This lets you trace each data point back to its source — essential for systematic review methodology.</div>
-          <div class="tip"><strong>Decimal separator</strong>Always use a dot (<code>.</code>) as the decimal separator when entering or importing values. Commas will cause parsing errors.</div>
+          <div class="tip"><strong>Stale indicator</strong>A ⚠ icon appears on charts and tables when the underlying pool has changed (e.g. after adding new articles). Always click <em>↺ Refresh</em> before drawing conclusions from updated data.</div>
+          <div class="tip"><strong>Lazy loading for performance</strong>Sub-tabs in Combine only load on first visit. Switching between them is instant — computation only reruns when data changes and you explicitly refresh.</div>
+          <div class="tip"><strong>Connection Map tips</strong>For cleaner maps, filter to a single category before drawing. Too many objects at once can produce a dense graph — use the object selector to focus on the most relevant subset.</div>
         </div>
       </div>
     </div>
+
   </div>
 </section>
 
@@ -496,7 +517,7 @@
         <p class="section-label">About the project</p>
         <h2 class="section-title" style="margin-bottom:24px">SLDM</h2>
         <p>SLDM was born from the practical need to organize large volumes of scientific literature in systematic reviews of toxicology and ecotoxicology, where manually identifying the presence of hundreds of compounds across dozens of articles is a slow and error-prone process.</p>
-        <p>The software was developed entirely in Python, with a focus on usability for researchers without a technical programming background. The interface reflects the natural flow of a bibliographic review: register → mine → compile → visualize.</p>
+        <p>The software was developed entirely in Python, with a focus on usability for researchers without a technical programming background. The interface reflects the natural flow of a bibliographic review: register → mine → search → combine → visualize.</p>
         <p>Distributed as a standalone executable requiring no environment setup, SLDM can be used immediately on any Windows computer.</p>
       </div>
       <div>
@@ -546,7 +567,7 @@
   (function () {
     const canvas = document.getElementById('network-canvas');
     const ctx = canvas.getContext('2d');
-    const COLORS = ['#F2A7B0','#A8D4F5','#A8E6CF','#F5D190','#C5B8F0','#F5C4A1'];
+    const COLORS = ['#F2A7B0','#A8D4F5','#A8E6CF','#F5D190','#C5B8F0','#F5C4A1','#A0E0DC'];
     let W, H, nodes = [], mouse = { x: -999, y: -999 };
     const N = 50, MAX_DIST = 160, MOUSE_R = 120;
     function resize() { W = canvas.width = canvas.offsetWidth; H = canvas.height = canvas.offsetHeight; }
