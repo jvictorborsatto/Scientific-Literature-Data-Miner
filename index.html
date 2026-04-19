@@ -6,644 +6,529 @@
   <title>SLDM — Scientific Literature Data Miner</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --cream:#F7F4EF; --paper:#FDFBF8; --ink:#1C1C1E; --ink-2:#4A4A52; --ink-3:#8E8E99;
-      --rose:#F2A7B0; --sky:#A8D4F5; --mint:#A8E6CF; --amber:#F5D190; --lavender:#C5B8F0; --peach:#F5C4A1;
-      --rose-d:#C97080; --sky-d:#5A9FD4; --mint-d:#5AB890; --amber-d:#C9A040; --lavender-d:#7B68C8;
-      --border:rgba(28,28,30,.08); --shadow:0 4px 24px rgba(28,28,30,.07); --shadow-lg:0 12px 48px rgba(28,28,30,.11);
-      --r:14px; --r-sm:8px;
+      --cream: #F7F4EF;
+      --paper: #FDFBF8;
+      --ink: #1C1C1E;
+      --ink-2: #4A4A52;
+      --ink-3: #8E8E99;
+      --lavender: #C5B8F0;
+      --lavender-d: #7B68C8;
+      --sky: #A8D4F5;
+      --sky-d: #5A9FD4;
+      --mint: #A8E6CF;
+      --mint-d: #5AB890;
+      --amber: #F5D190;
+      --amber-d: #C9A040;
+      --rose: #F2A7B0;
+      --rose-d: #C97080;
+      --peach: #F5C4A1;
+      --border: rgba(28,28,30,.08);
+      --shadow: 0 4px 24px rgba(28,28,30,.07);
+      --shadow-lg: 0 12px 48px rgba(28,28,30,.11);
+      --r: 14px;
+      --r-sm: 8px;
     }
 
-    /* ── I18N ── */
-    [data-lang]       { display: none; }
-    .lang-en [data-lang="en"],
-    .lang-pt [data-lang="pt"] { display: revert; }
-    span[data-lang]   { display: none; }
-    .lang-en span[data-lang="en"],
-    .lang-pt span[data-lang="pt"] { display: inline; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); overflow-x: hidden; }
+    ::selection { background: var(--lavender); color: var(--ink); }
+    a { color: inherit; text-decoration: none; }
+    h1, h2, h3, h4 { font-family: 'Playfair Display', serif; line-height: 1.2; }
+    code { font-family: 'DM Mono', monospace; font-size: .88em; background: var(--cream); padding: 2px 6px; border-radius: 4px; }
 
-    /* ── RESET ── */
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-    html{scroll-behavior:smooth;font-size:16px;}
-    body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);overflow-x:hidden;}
-    ::selection{background:var(--lavender);color:var(--ink);}
-    img{max-width:100%;display:block;}
-    a{color:inherit;text-decoration:none;}
-    h1,h2,h3,h4{font-family:'Playfair Display',serif;line-height:1.2;}
+    /* NAV */
+    #navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(253,251,248,.9); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); transition: box-shadow .3s; }
+    #navbar.scrolled { box-shadow: var(--shadow); }
+    .nav-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 62px; }
+    .nav-logo { font-family: 'DM Mono', monospace; font-size: 1.1rem; font-weight: 500; letter-spacing: .04em; }
+    .nav-logo span { color: var(--lavender-d); }
+    .nav-links { display: flex; gap: 4px; list-style: none; }
+    .nav-links a { font-size: .875rem; color: var(--ink-2); padding: 6px 14px; border-radius: 20px; transition: background .2s, color .2s; }
+    .nav-links a:hover { background: var(--cream); color: var(--ink); }
+    .nav-cta { background: var(--ink) !important; color: var(--paper) !important; font-weight: 500 !important; border-radius: 20px; }
+    .nav-cta:hover { background: #333 !important; }
 
-    /* ── NAV ── */
-    #navbar{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(253,251,248,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);transition:box-shadow .3s;}
-    #navbar.scrolled{box-shadow:var(--shadow);}
-    .nav-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:62px;}
-    .nav-logo{font-family:'DM Mono',monospace;font-size:1.15rem;font-weight:500;letter-spacing:.04em;}
-    .logo-s{color:var(--lavender-d);}
-    .nav-right{display:flex;align-items:center;gap:4px;}
-    .nav-links{display:flex;gap:8px;list-style:none;}
-    .nav-links a{font-size:.875rem;font-weight:400;color:var(--ink-2);padding:6px 14px;border-radius:20px;transition:background .2s,color .2s;}
-    .nav-links a:hover{background:var(--cream);color:var(--ink);}
-    .nav-cta{background:var(--ink)!important;color:var(--paper)!important;font-weight:500!important;}
-    .nav-cta:hover{background:#333!important;}
+    /* HERO */
+    #hero { min-height: 100vh; display: flex; align-items: center; padding: 100px 32px 60px; position: relative; overflow: hidden; }
+    #network-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+    .hero-inner { max-width: 1100px; margin: 0 auto; width: 100%; position: relative; z-index: 2; }
+    .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--lavender); color: var(--lavender-d); font-family: 'DM Mono', monospace; font-size: .78rem; font-weight: 500; padding: 5px 13px; border-radius: 20px; letter-spacing: .06em; margin-bottom: 20px; }
+    .hero-tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--lavender-d); }
+    .hero-title { font-size: clamp(2.8rem, 6vw, 5rem); font-weight: 700; line-height: 1.05; margin-bottom: 12px; max-width: 720px; }
+    .hero-title em { font-style: italic; color: var(--lavender-d); }
+    .hero-sub { font-family: 'DM Mono', monospace; font-size: .88rem; color: var(--ink-3); letter-spacing: .1em; margin-bottom: 24px; }
+    .hero-desc { font-size: 1.05rem; color: var(--ink-2); line-height: 1.7; max-width: 560px; margin-bottom: 36px; }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 56px; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; font-family: 'DM Sans', sans-serif; font-size: .9rem; font-weight: 500; padding: 12px 24px; border-radius: 10px; border: none; cursor: pointer; transition: transform .2s, box-shadow .2s; text-decoration: none; }
+    .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .btn-primary { background: var(--ink); color: var(--paper); }
+    .btn-primary:hover { background: #2c2c30; }
+    .btn-ghost { background: transparent; color: var(--ink-2); border: 1.5px solid var(--border); }
+    .btn-ghost:hover { background: var(--cream); }
+    .hero-stats { display: flex; gap: 48px; flex-wrap: wrap; }
+    .stat-val { font-family: 'Playfair Display', serif; font-size: 1.7rem; font-weight: 700; }
+    .stat-lbl { font-size: .78rem; color: var(--ink-3); margin-top: 2px; }
 
-    /* ── LANG SWITCHER ── */
-    .lang-switcher{display:flex;align-items:center;background:var(--cream);border-radius:20px;padding:3px;gap:2px;border:1px solid var(--border);margin-left:10px;}
-    .lang-btn{font-family:'DM Mono',monospace;font-size:.72rem;font-weight:500;padding:4px 10px;border-radius:16px;border:none;cursor:pointer;background:transparent;color:var(--ink-3);transition:background .2s,color .2s;letter-spacing:.04em;}
-    .lang-btn.active{background:var(--paper);color:var(--ink);box-shadow:var(--shadow);}
-    .lang-btn:hover:not(.active){color:var(--ink-2);}
+    /* SECTIONS */
+    section { padding: 96px 32px; }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+    .section-label { font-family: 'DM Mono', monospace; font-size: .72rem; font-weight: 500; letter-spacing: .12em; color: var(--ink-3); text-transform: uppercase; margin-bottom: 12px; }
+    .section-title { font-size: clamp(1.8rem, 3vw, 2.5rem); margin-bottom: 16px; }
+    .section-lead { font-size: 1rem; color: var(--ink-2); line-height: 1.7; max-width: 600px; margin-bottom: 52px; }
 
-    /* ── HERO ── */
-    #hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:100px 32px 60px;position:relative;overflow:hidden;}
-    #network-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
-    .hero-inner{max-width:1100px;margin:0 auto;width:100%;position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;}
-    .hero-tag{display:inline-flex;align-items:center;gap:8px;background:var(--lavender);color:var(--lavender-d);font-family:'DM Mono',monospace;font-size:.78rem;font-weight:500;padding:5px 13px;border-radius:20px;letter-spacing:.06em;margin-bottom:20px;}
-    .hero-tag::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--lavender-d);}
-    .hero-title{font-size:clamp(2.2rem,4.5vw,3.6rem);font-weight:700;line-height:1.1;margin-bottom:8px;}
-    .hero-title em{font-style:italic;color:var(--lavender-d);}
-    .hero-subtitle{font-family:'DM Mono',monospace;font-size:.9rem;color:var(--ink-3);letter-spacing:.1em;margin-bottom:24px;}
-    .hero-desc{font-size:1.05rem;color:var(--ink-2);line-height:1.7;max-width:480px;margin-bottom:36px;}
-    .hero-actions{display:flex;gap:12px;flex-wrap:wrap;}
-    .btn{display:inline-flex;align-items:center;gap:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:500;padding:12px 24px;border-radius:10px;border:none;cursor:pointer;transition:transform .2s,box-shadow .2s,background .2s;text-decoration:none;}
-    .btn:hover{transform:translateY(-2px);box-shadow:var(--shadow);}
-    .btn:active{transform:translateY(0);}
-    .btn-primary{background:var(--ink);color:var(--paper);}
-    .btn-primary:hover{background:#2c2c30;}
-    .btn-ghost{background:transparent;color:var(--ink-2);border:1.5px solid var(--border);}
-    .btn-ghost:hover{background:var(--cream);border-color:transparent;}
-    .hero-mockup{background:var(--cream);border:1px solid var(--border);border-radius:18px;overflow:hidden;box-shadow:var(--shadow-lg);aspect-ratio:4/3;display:flex;flex-direction:column;}
-    .mockup-bar{background:rgba(28,28,30,.05);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:6px;}
-    .mockup-dot{width:10px;height:10px;border-radius:50%;}
+    /* DOWNLOAD */
+    #download { background: var(--cream); }
+    .dl-card { background: var(--paper); border: 1px solid var(--border); border-radius: var(--r); padding: 28px 24px; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow); max-width: 400px; position: relative; overflow: hidden; transition: transform .25s, box-shadow .25s; }
+    .dl-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--sky); }
+    .dl-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .dl-icon { width: 48px; height: 48px; border-radius: 12px; background: var(--sky); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+    .dl-name { font-family: 'Playfair Display', serif; font-size: 1.2rem; }
+    .dl-version { font-family: 'DM Mono', monospace; font-size: .72rem; color: var(--ink-3); }
+    .dl-desc { font-size: .875rem; color: var(--ink-2); line-height: 1.5; }
+    .dl-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: var(--r-sm); font-size: .875rem; font-weight: 500; border: none; cursor: pointer; background: var(--sky); color: var(--sky-d); transition: filter .2s, transform .2s; text-decoration: none; }
+    .dl-btn:hover { filter: brightness(.93); transform: translateY(-1px); }
+    .doi-block { margin-top: 24px; background: var(--paper); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 16px 20px; max-width: 400px; }
+    .doi-label { font-family: 'DM Mono', monospace; font-size: .68rem; color: var(--ink-3); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; }
+    .doi-val { font-family: 'DM Mono', monospace; font-size: .95rem; color: var(--lavender-d); font-weight: 500; }
 
-    /* ── SECTIONS ── */
-    section{padding:96px 32px;}
-    .section-inner{max-width:1100px;margin:0 auto;}
-    .section-label{font-family:'DM Mono',monospace;font-size:.75rem;font-weight:500;letter-spacing:.12em;color:var(--ink-3);text-transform:uppercase;margin-bottom:12px;}
-    .section-title{font-size:clamp(1.8rem,3vw,2.6rem);margin-bottom:16px;}
-    .section-lead{font-size:1.05rem;color:var(--ink-2);line-height:1.7;max-width:600px;margin-bottom:56px;}
+    /* TABS */
+    .tabs-nav { display: flex; gap: 4px; background: var(--cream); border-radius: 12px; padding: 4px; width: fit-content; margin-bottom: 40px; }
+    .tab-btn { padding: 9px 22px; border-radius: 9px; border: none; font-family: 'DM Sans', sans-serif; font-size: .875rem; background: transparent; color: var(--ink-2); cursor: pointer; transition: background .2s, color .2s, box-shadow .2s; }
+    .tab-btn.active { background: var(--paper); color: var(--ink); font-weight: 500; box-shadow: var(--shadow); }
+    .tab-panel { display: none; animation: fadeIn .3s ease; }
+    .tab-panel.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
-    /* ── DOWNLOAD ── */
-    #download{background:var(--cream);}
-    .dl-card{background:var(--paper);border:1px solid var(--border);border-radius:var(--r);padding:28px 24px;display:flex;flex-direction:column;gap:16px;box-shadow:var(--shadow);transition:transform .25s,box-shadow .25s;position:relative;overflow:hidden;max-width:400px;}
-    .dl-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
-    .dl-card.windows::before{background:var(--sky);}
-    .dl-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);}
-    .dl-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;}
-    .dl-card.windows .dl-icon{background:var(--sky);}
-    .dl-name{font-family:'Playfair Display',serif;font-size:1.2rem;}
-    .dl-desc{font-size:.875rem;color:var(--ink-2);line-height:1.5;flex:1;}
-    .dl-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;border-radius:var(--r-sm);font-size:.875rem;font-weight:500;border:none;cursor:pointer;transition:filter .2s,transform .2s;text-decoration:none;}
-    .dl-btn:hover{filter:brightness(.93);transform:translateY(-1px);}
-    .dl-card.windows .dl-btn{background:var(--sky);color:var(--sky-d);}
-    .dl-version{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--ink-3);}
+    /* HOW IT WORKS */
+    #how { background: var(--paper); }
+    .features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 52px; }
+    .feat-card { background: var(--cream); border: 1px solid var(--border); border-radius: var(--r); padding: 24px; display: flex; gap: 18px; align-items: flex-start; transition: transform .2s; }
+    .feat-card:hover { transform: translateY(-2px); }
+    .feat-icon { width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
+    .feat-card:nth-child(1) .feat-icon { background: var(--lavender); }
+    .feat-card:nth-child(2) .feat-icon { background: var(--sky); }
+    .feat-card:nth-child(3) .feat-icon { background: var(--mint); }
+    .feat-card:nth-child(4) .feat-icon { background: var(--amber); }
+    .feat-card:nth-child(5) .feat-icon { background: var(--rose); }
+    .feat-card:nth-child(6) .feat-icon { background: var(--peach); }
+    .feat-body h4 { font-size: 1rem; margin-bottom: 6px; }
+    .feat-body p { font-size: .875rem; color: var(--ink-2); line-height: 1.6; }
 
-    /* ── TABS ── */
-    #how{background:var(--paper);}
-    .tabs-nav{display:flex;gap:4px;background:var(--cream);border-radius:12px;padding:4px;width:fit-content;margin-bottom:40px;}
-    .tab-btn{padding:9px 22px;border-radius:9px;border:none;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:400;background:transparent;color:var(--ink-2);cursor:pointer;transition:background .2s,color .2s,box-shadow .2s;}
-    .tab-btn.active{background:var(--paper);color:var(--ink);font-weight:500;box-shadow:var(--shadow);}
-    .tab-panel{display:none;animation:fadeIn .3s ease;}
-    .tab-panel.active{display:block;}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+    .workflow { display: flex; flex-direction: column; max-width: 680px; }
+    .wf-step { display: flex; gap: 24px; align-items: flex-start; position: relative; }
+    .wf-step:not(:last-child)::after { content: ''; position: absolute; left: 19px; top: 44px; width: 2px; height: calc(100% - 12px); background: linear-gradient(to bottom, var(--border), transparent); }
+    .wf-num { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: .85rem; font-weight: 500; border: 2px solid var(--border); background: var(--paper); position: relative; z-index: 1; }
+    .wf-step:nth-child(1) .wf-num { border-color: var(--lavender); color: var(--lavender-d); }
+    .wf-step:nth-child(2) .wf-num { border-color: var(--sky); color: var(--sky-d); }
+    .wf-step:nth-child(3) .wf-num { border-color: var(--mint); color: var(--mint-d); }
+    .wf-step:nth-child(4) .wf-num { border-color: var(--amber); color: var(--amber-d); }
+    .wf-step:nth-child(5) .wf-num { border-color: var(--rose); color: var(--rose-d); }
+    .wf-body { padding: 8px 0 36px; }
+    .wf-body h4 { font-size: 1rem; margin-bottom: 5px; }
+    .wf-body p { font-size: .875rem; color: var(--ink-2); line-height: 1.6; }
 
-    /* ── FEATURES GRID ── */
-    .features-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;}
-    .feat-card{background:var(--cream);border:1px solid var(--border);border-radius:var(--r);padding:24px;display:flex;gap:18px;align-items:flex-start;transition:transform .2s;}
-    .feat-card:hover{transform:translateY(-2px);}
-    .feat-icon{width:44px;height:44px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.3rem;}
-    .feat-card:nth-child(1) .feat-icon{background:var(--lavender);}
-    .feat-card:nth-child(2) .feat-icon{background:var(--sky);}
-    .feat-card:nth-child(3) .feat-icon{background:var(--mint);}
-    .feat-card:nth-child(4) .feat-icon{background:var(--amber);}
-    .feat-card:nth-child(5) .feat-icon{background:var(--rose);}
-    .feat-card:nth-child(6) .feat-icon{background:var(--peach);}
-    .feat-body h4{font-size:1rem;margin-bottom:6px;}
-    .feat-body p{font-size:.875rem;color:var(--ink-2);line-height:1.6;}
+    .tech-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+    .tech-block h4 { font-size: 1rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .tech-block h4::before { content: ''; width: 8px; height: 8px; border-radius: 50%; }
+    .tech-block:nth-child(1) h4::before { background: var(--lavender-d); }
+    .tech-block:nth-child(2) h4::before { background: var(--sky-d); }
+    .tech-block:nth-child(3) h4::before { background: var(--mint-d); }
+    .tech-block:nth-child(4) h4::before { background: var(--rose-d); }
+    .tech-block p { font-size: .875rem; color: var(--ink-2); line-height: 1.7; margin-bottom: 12px; }
+    .pill-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pill { font-family: 'DM Mono', monospace; font-size: .72rem; padding: 4px 10px; border-radius: 20px; border: 1.5px solid var(--border); color: var(--ink-2); background: var(--cream); }
+    .arch-diagram { grid-column: 1 / -1; background: var(--cream); border: 1px solid var(--border); border-radius: var(--r); padding: 28px; }
+    .arch-diagram h4 { font-size: 1rem; margin-bottom: 20px; }
+    .arch-flow { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    .arch-box { background: var(--paper); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 12px 16px; text-align: center; font-size: .8rem; flex: 1; min-width: 100px; }
+    .arch-label { font-family: 'DM Mono', monospace; font-size: .68rem; color: var(--ink-3); display: block; margin-bottom: 3px; }
+    .arch-name { font-weight: 500; }
+    .arch-arrow { color: var(--ink-3); font-size: 1.1rem; flex-shrink: 0; }
 
-    /* ── WORKFLOW ── */
-    .workflow{display:flex;flex-direction:column;gap:0;max-width:680px;}
-    .wf-step{display:flex;gap:24px;align-items:flex-start;position:relative;}
-    .wf-step:not(:last-child)::after{content:'';position:absolute;left:19px;top:44px;width:2px;height:calc(100% - 12px);background:linear-gradient(to bottom,var(--border),transparent);}
-    .wf-num{width:40px;height:40px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:.85rem;font-weight:500;border:2px solid var(--border);background:var(--paper);position:relative;z-index:1;}
-    .wf-step:nth-child(1) .wf-num{border-color:var(--lavender);color:var(--lavender-d);}
-    .wf-step:nth-child(2) .wf-num{border-color:var(--sky);color:var(--sky-d);}
-    .wf-step:nth-child(3) .wf-num{border-color:var(--mint);color:var(--mint-d);}
-    .wf-step:nth-child(4) .wf-num{border-color:var(--amber);color:var(--amber-d);}
-    .wf-step:nth-child(5) .wf-num{border-color:var(--rose);color:var(--rose-d);}
-    .wf-body{padding:8px 0 36px;}
-    .wf-body h4{font-size:1rem;margin-bottom:5px;}
-    .wf-body p{font-size:.875rem;color:var(--ink-2);line-height:1.6;}
+    /* HOW TO USE */
+    #howto { background: var(--cream); }
+    .module-tabs { display: flex; background: var(--paper); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; margin-bottom: 32px; }
+    .mod-btn { flex: 1; padding: 16px 12px; border: none; background: transparent; font-family: 'DM Sans', sans-serif; font-size: .875rem; color: var(--ink-2); cursor: pointer; border-right: 1px solid var(--border); transition: background .2s, color .2s; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .mod-btn:last-child { border-right: none; }
+    .mod-btn .m-icon { font-size: 1.4rem; }
+    .mod-btn .m-name { font-weight: 500; font-size: .82rem; }
+    .mod-btn.active { background: var(--cream); color: var(--ink); }
+    .mod-btn:hover:not(.active) { background: rgba(28,28,30,.03); }
+    .mod-panel { display: none; animation: fadeIn .3s ease; }
+    .mod-panel.active { display: block; }
+    .mod-content { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+    .mod-left h3 { font-size: 1.3rem; margin-bottom: 10px; }
+    .mod-desc { font-size: .95rem; color: var(--ink-2); line-height: 1.75; margin-bottom: 28px; }
+    .mod-steps { display: flex; flex-direction: column; gap: 20px; }
+    .mod-step { display: flex; gap: 14px; align-items: flex-start; }
+    .mod-step-num { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: .75rem; font-weight: 500; color: var(--paper); margin-top: 2px; }
+    .mod-step strong { display: block; font-size: .9rem; margin-bottom: 4px; }
+    .mod-step p { font-size: .83rem; color: var(--ink-2); line-height: 1.65; }
+    .tips-title { font-family: 'DM Mono', monospace; font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 14px; }
+    .tip { background: var(--paper); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 14px 16px; margin-bottom: 10px; font-size: .83rem; color: var(--ink-2); line-height: 1.65; }
+    .tip strong { color: var(--ink); display: block; margin-bottom: 4px; }
 
-    /* ── TECH GRID ── */
-    .tech-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;}
-    .tech-block h4{font-size:1rem;margin-bottom:12px;color:var(--ink);display:flex;align-items:center;gap:8px;}
-    .tech-block h4::before{content:'';width:8px;height:8px;border-radius:50%;}
-    .tech-block:nth-child(1) h4::before{background:var(--lavender-d);}
-    .tech-block:nth-child(2) h4::before{background:var(--sky-d);}
-    .tech-block:nth-child(3) h4::before{background:var(--mint-d);}
-    .tech-block:nth-child(4) h4::before{background:var(--rose-d);}
-    .tech-block p{font-size:.875rem;color:var(--ink-2);line-height:1.7;margin-bottom:14px;}
-    .pill-list{display:flex;flex-wrap:wrap;gap:6px;}
-    .pill{font-family:'DM Mono',monospace;font-size:.73rem;padding:4px 10px;border-radius:20px;border:1.5px solid var(--border);color:var(--ink-2);background:var(--cream);}
-    .arch-diagram{grid-column:1/-1;background:var(--cream);border:1px solid var(--border);border-radius:var(--r);padding:28px;}
-    .arch-diagram h4{font-size:1rem;margin-bottom:20px;}
-    .arch-flow{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
-    .arch-box{background:var(--paper);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 16px;text-align:center;font-size:.8rem;flex:1;min-width:100px;}
-    .arch-box .arch-label{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--ink-3);display:block;margin-bottom:3px;}
-    .arch-box .arch-name{font-weight:500;}
-    .arch-arrow{color:var(--ink-3);font-size:1.1rem;flex-shrink:0;}
+    /* CSV */
+    .csv-block { background: var(--paper); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; margin-bottom: 20px; }
+    .csv-header { padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+    .csv-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+    .csv-body { padding: 20px 24px; }
+    .csv-schema { background: var(--cream); border: 1px solid var(--border); border-radius: var(--r-sm); overflow: hidden; margin-bottom: 16px; }
+    .csv-schema-lbl { padding: 6px 16px; background: rgba(28,28,30,.03); border-bottom: 1px solid var(--border); font-family: 'DM Mono', monospace; font-size: .68rem; color: var(--ink-3); }
+    .csv-schema-val { padding: 12px 16px; font-family: 'DM Mono', monospace; font-size: .82rem; color: var(--ink-2); overflow-x: auto; white-space: nowrap; }
+    .csv-fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+    .csv-field { background: var(--cream); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 12px 14px; }
+    .csv-fname { font-family: 'DM Mono', monospace; font-size: .72rem; margin-bottom: 5px; }
+    .csv-fdesc { font-size: .8rem; color: var(--ink-2); line-height: 1.5; }
+    .req { color: var(--rose-d); font-size: .65rem; }
 
-    /* ── SCREENSHOTS ── */
-    #screenshots{background:var(--cream);}
-    .screenshots-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
-    .shot-card{border-radius:var(--r);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);background:var(--paper);transition:transform .25s,box-shadow .25s;}
-    .shot-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);}
-    .shot-img{aspect-ratio:16/10;background:var(--cream);border-bottom:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;color:var(--ink-3);font-size:.8rem;font-family:'DM Mono',monospace;text-align:center;}
-    .shot-img .shot-icon{font-size:2rem;opacity:.4;}
-    .shot-caption{padding:14px 16px;font-size:.85rem;font-weight:500;}
-    .shot-sub{padding:0 16px 14px;font-size:.78rem;color:var(--ink-3);}
+    /* ABOUT */
+    #about { background: var(--paper); }
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+    .about-text p { font-size: .95rem; color: var(--ink-2); line-height: 1.75; margin-bottom: 16px; }
+    .reg-card { background: var(--cream); border: 1px solid var(--border); border-radius: var(--r); padding: 28px; }
+    .reg-card h3 { font-size: 1.1rem; margin-bottom: 6px; }
+    .reg-sub { font-size: .82rem; color: var(--ink-3); margin-bottom: 20px; }
+    .reg-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: .875rem; }
+    .reg-row:last-child { border-bottom: none; }
+    .reg-key { color: var(--ink-3); }
+    .reg-val { font-family: 'DM Mono', monospace; font-size: .82rem; color: var(--ink); font-weight: 500; }
 
-    /* ── ABOUT / REGISTRO ── */
-    #about{background:var(--paper);}
-    .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start;}
-    .about-text p{font-size:.95rem;color:var(--ink-2);line-height:1.75;margin-bottom:16px;}
-    .registro-card{background:var(--cream);border:1px solid var(--border);border-radius:var(--r);padding:28px;}
-    .registro-card h3{font-size:1.1rem;margin-bottom:6px;}
-    .registro-card .reg-sub{font-size:.82rem;color:var(--ink-3);margin-bottom:20px;}
-    .reg-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:.875rem;}
-    .reg-row:last-child{border-bottom:none;}
-    .reg-key{color:var(--ink-3);}
-    .reg-val{font-family:'DM Mono',monospace;font-size:.82rem;color:var(--ink);font-weight:500;}
-    .reg-pending{font-style:italic;color:var(--ink-3);font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:300;}
+    /* FOOTER */
+    footer { background: var(--ink); color: rgba(255,255,255,.55); padding: 48px 32px; }
+    .footer-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px; }
+    .footer-logo { font-family: 'DM Mono', monospace; font-size: 1rem; color: rgba(255,255,255,.9); }
+    .footer-logo span { color: var(--lavender); }
+    .footer-copy { font-size: .82rem; }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a { font-size: .82rem; color: rgba(255,255,255,.45); transition: color .2s; }
+    .footer-links a:hover { color: rgba(255,255,255,.9); }
 
-    /* ── FOOTER ── */
-    footer{background:var(--ink);color:rgba(255,255,255,.6);padding:48px 32px;}
-    .footer-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px;}
-    .footer-logo{font-family:'DM Mono',monospace;font-size:1rem;color:rgba(255,255,255,.9);letter-spacing:.04em;}
-    .footer-logo span{color:var(--lavender);}
-    .footer-copy{font-size:.82rem;}
-    .footer-links{display:flex;gap:20px;}
-    .footer-links a{font-size:.82rem;color:rgba(255,255,255,.5);transition:color .2s;}
-    .footer-links a:hover{color:rgba(255,255,255,.9);}
-
-    /* ── CSV HELPERS ── */
-    .csv-block{background:var(--cream);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:20px;}
-    .csv-header{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
-    .csv-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
-    .csv-body{padding:20px 24px;}
-    .csv-schema{background:var(--paper);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;margin-bottom:16px;}
-    .csv-schema-lbl{padding:7px 16px;background:rgba(28,28,30,.03);border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:.7rem;color:var(--ink-3);}
-    .csv-schema-val{padding:12px 16px;font-family:'DM Mono',monospace;font-size:.82rem;color:var(--ink-2);overflow-x:auto;white-space:nowrap;}
-    .csv-fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;}
-    .csv-field{background:var(--paper);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;}
-    .csv-fname{font-family:'DM Mono',monospace;font-size:.72rem;margin-bottom:5px;}
-    .csv-fdesc{font-size:.8rem;color:var(--ink-2);line-height:1.5;}
-    .req{color:var(--rose-d);font-size:.65rem;}
-
-    /* ── RESPONSIVE ── */
-    @media(max-width:900px){
-      .hero-inner,.about-grid{grid-template-columns:1fr;}
-      .hero-inner{gap:40px;} .about-grid{gap:32px;}
-      .hero-mockup{max-width:480px;}
-      .features-grid,.tech-grid{grid-template-columns:1fr;}
-      .screenshots-grid{grid-template-columns:1fr;max-width:420px;}
-      .nav-links{display:none;}
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .features-grid, .tech-grid, .about-grid, .mod-content { grid-template-columns: 1fr; }
+      .about-grid, .mod-content { gap: 32px; }
+      .nav-links { display: none; }
+      .mod-btn .m-name { display: none; }
+    }
+    @media (max-width: 600px) {
+      section { padding: 64px 20px; }
+      .module-tabs { flex-direction: column; }
+      .mod-btn { border-right: none; border-bottom: 1px solid var(--border); flex-direction: row; gap: 10px; }
+      .mod-btn .m-name { display: block; }
     }
   </style>
 </head>
-<body class="lang-en">
+<body>
 
-<!-- NAV -->
 <nav id="navbar">
   <div class="nav-inner">
-    <a href="#hero" class="nav-logo"><span class="logo-s">S</span>LDM</a>
-    <div class="nav-right">
-      <ul class="nav-links">
-        <li><a href="#how"><span data-lang="en">How it works</span><span data-lang="pt">Como funciona</span></a></li>
-        <li><a href="#screenshots">Screenshots</a></li>
-        <li><a href="#about"><span data-lang="en">About</span><span data-lang="pt">Sobre</span></a></li>
-        <li><a href="#download" class="nav-cta">Download</a></li>
-      </ul>
-      <div class="lang-switcher">
-        <button class="lang-btn active" onclick="setLang('en',this)">EN</button>
-        <button class="lang-btn" onclick="setLang('pt',this)">PT</button>
-      </div>
-    </div>
+    <a href="#hero" class="nav-logo"><span>S</span>LDM</a>
+    <ul class="nav-links">
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#howto">How to use</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#download" class="nav-cta">Download</a></li>
+    </ul>
   </div>
 </nav>
 
-<!-- HERO -->
 <section id="hero">
   <canvas id="network-canvas"></canvas>
   <div class="hero-inner">
-    <div class="hero-left">
-      <div class="hero-tag">v1.0.0 &nbsp;·&nbsp; <span data-lang="en">Scientific Software</span><span data-lang="pt">Software Científico</span></div>
-      <h1 class="hero-title">Scientific<br/><em>Literature</em><br/>Data Miner</h1>
-      <p class="hero-subtitle">SLDM &nbsp;—&nbsp; <span data-lang="en">Scientific Literature Data Mining</span><span data-lang="pt">Mineração de Literatura Científica</span></p>
-      <p class="hero-desc" data-lang="en">A desktop tool to organize scientific articles, automatically identify compounds, species and parameters of interest, and generate publication-ready exploratory visualizations.</p>
-      <p class="hero-desc" data-lang="pt">Uma ferramenta desktop para organizar artigos científicos, identificar automaticamente compostos, espécies e parâmetros de interesse, e gerar visualizações exploratórias prontas para publicação.</p>
-      <div class="hero-actions">
-        <a href="https://github.com/jvictorborsatto/Scientific-Literature-Data-Mining/releases/download/SLDM/SLDM.zip" class="btn btn-primary">↓ &nbsp;<span data-lang="en">Download for Windows</span><span data-lang="pt">Download para Windows</span></a>
-        <a href="#how" class="btn btn-ghost"><span data-lang="en">How it works →</span><span data-lang="pt">Como funciona →</span></a>
-      </div>
+    <div class="hero-tag">v1.0.0 · Scientific Software</div>
+    <h1 class="hero-title">Scientific<br/><em>Literature</em><br/>Data Miner</h1>
+    <p class="hero-sub">SLDM — Scientific Literature Data Mining</p>
+    <p class="hero-desc">A desktop tool to organize scientific articles, automatically identify compounds, species and parameters of interest, and generate publication-ready exploratory visualizations.</p>
+    <div class="hero-actions">
+      <a href="https://github.com/jvictorborsatto/Scientific-Literature-Data-Mining/releases/download/SLDM/SLDM.zip" class="btn btn-primary">↓ Download for Windows</a>
+      <a href="#how" class="btn btn-ghost">How it works →</a>
     </div>
-    <div class="hero-right">
-      <div class="hero-mockup">
-        <div class="mockup-bar">
-          <div class="mockup-dot" style="background:var(--rose)"></div>
-          <div class="mockup-dot" style="background:var(--amber)"></div>
-          <div class="mockup-dot" style="background:var(--mint)"></div>
-        </div>
-        <div style="flex:1;overflow:hidden;">
-          <img src="https://raw.githubusercontent.com/jvictorborsatto/Scientific-Literature-Data-Mining/main/SLDM_1.PNG" alt="SLDM interface" style="width:100%;height:100%;object-fit:cover;" />
-        </div>
-      </div>
+    <div class="hero-stats">
+      <div><div class="stat-val">4</div><div class="stat-lbl">Integrated modules</div></div>
+      <div><div class="stat-val">Python</div><div class="stat-lbl">Open source</div></div>
+      <div><div class="stat-val">.sldm</div><div class="stat-lbl">Single portable file</div></div>
     </div>
   </div>
 </section>
 
-<!-- DOWNLOAD -->
 <section id="download">
   <div class="section-inner">
     <p class="section-label">Download</p>
-    <h2 class="section-title"><span data-lang="en">Windows Download</span><span data-lang="pt">Download para Windows</span></h2>
-    <p class="section-lead" data-lang="en">No Python installation required. Download, extract and run. The executable already includes all dependencies bundled in.</p>
-    <p class="section-lead" data-lang="pt">Sem instalação de Python necessária. Baixe, extraia e execute. O executável já inclui todas as dependências embutidas.</p>
-    <div class="dl-card windows">
+    <h2 class="section-title">Windows Download</h2>
+    <p class="section-lead">No Python installation required. Download, extract and run. The executable already includes all dependencies bundled in.</p>
+    <div class="dl-card">
       <div class="dl-icon">🪟</div>
       <div>
         <div class="dl-name">Windows</div>
         <div class="dl-version">v1.0.0 · Windows 10 / 11</div>
       </div>
-      <p class="dl-desc" data-lang="en">Tested and stable release. Extract the <code>SLDM/</code> folder and run <code>SLDM.exe</code>. No installation needed.</p>
-      <p class="dl-desc" data-lang="pt">Versão testada e estável. Extraia a pasta <code>SLDM/</code> e execute <code>SLDM.exe</code>. Não requer instalação.</p>
-      <a href="https://github.com/jvictorborsatto/Scientific-Literature-Data-Mining/releases/download/SLDM/SLDM.zip" class="dl-btn">↓ &nbsp;Download .zip</a>
+      <p class="dl-desc">Tested and stable release. Extract the <code>SLDM/</code> folder and run <code>SLDM.exe</code>. No installation needed.</p>
+      <a href="https://github.com/jvictorborsatto/Scientific-Literature-Data-Mining/releases/download/SLDM/SLDM.zip" class="dl-btn">↓ Download .zip</a>
+    </div>
+    <div class="doi-block">
+      <div class="doi-label">DOI</div>
+      <div class="doi-val">XXXXXX</div>
     </div>
   </div>
 </section>
 
-<!-- HOW IT WORKS -->
 <section id="how">
   <div class="section-inner">
-    <p class="section-label" data-lang="en">Documentation</p>
-    <p class="section-label" data-lang="pt">Documentação</p>
-    <h2 class="section-title" data-lang="en">How it works</h2>
-    <h2 class="section-title" data-lang="pt">Como funciona</h2>
+    <p class="section-label">Documentation</p>
+    <h2 class="section-title">How it works</h2>
 
     <div class="tabs-nav">
-      <button class="tab-btn active" onclick="switchTab('user',this)">👤 <span data-lang="en">For the user</span><span data-lang="pt">Para o usuário</span></button>
-      <button class="tab-btn" onclick="switchTab('tech',this)">⚙️ <span data-lang="en">Under the hood</span><span data-lang="pt">Por dentro do sistema</span></button>
+      <button class="tab-btn active" onclick="switchTab('user', this)">👤 For the user</button>
+      <button class="tab-btn" onclick="switchTab('tech', this)">⚙️ Under the hood</button>
     </div>
 
-    <!-- TAB USER -->
     <div id="tab-user" class="tab-panel active">
-      <div class="features-grid" style="margin-bottom:48px">
-
+      <div class="features-grid">
         <div class="feat-card">
           <div class="feat-icon">📋</div>
-          <div class="feat-body">
-            <h4 data-lang="en">Object List</h4><h4 data-lang="pt">Lista de Objetos</h4>
-            <p data-lang="en">Register compounds, species, genes or any entity of interest, with categories, subcategories and synonyms. Import from CSV in one click.</p>
-            <p data-lang="pt">Cadastre compostos, espécies, genes ou qualquer entidade de interesse, com categorias, subcategorias e sinônimos. Importe de CSV com um clique.</p>
-          </div>
+          <div class="feat-body"><h4>Object List</h4><p>Register compounds, species, genes or any entity of interest, with categories, subcategories and synonyms. Import from CSV in one click.</p></div>
         </div>
-
         <div class="feat-card">
           <div class="feat-icon">🔍</div>
-          <div class="feat-body">
-            <h4 data-lang="en">Article Mining</h4><h4 data-lang="pt">Mineração de Artigos</h4>
-            <p data-lang="en">Add articles as PDF or paste text manually. The scanner automatically detects which objects appear in each article.</p>
-            <p data-lang="pt">Adicione artigos em PDF ou cole o texto manualmente. O scanner detecta automaticamente quais objetos aparecem em cada artigo.</p>
-          </div>
+          <div class="feat-body"><h4>Article Mining</h4><p>Add articles as PDF or paste text manually. The scanner automatically detects which objects appear in each article.</p></div>
         </div>
-
         <div class="feat-card">
           <div class="feat-icon">📊</div>
-          <div class="feat-body">
-            <h4 data-lang="en">Interactive Visualizations</h4><h4 data-lang="pt">Visualizações Interativas</h4>
-            <p data-lang="en">Generate bar charts, line plots, scatter plots, heatmaps and pie charts directly from your data. Exportable in high resolution.</p>
-            <p data-lang="pt">Gere gráficos de barras, linhas, dispersão, mapas de calor e pizza diretamente dos seus dados. Exportáveis em alta resolução.</p>
-          </div>
+          <div class="feat-body"><h4>Interactive Visualizations</h4><p>Generate bar charts, line plots, scatter plots, heatmaps and pie charts from your data. Exportable in high resolution.</p></div>
         </div>
-
         <div class="feat-card">
           <div class="feat-icon">🗃️</div>
-          <div class="feat-body">
-            <h4 data-lang="en">Data Compiler</h4><h4 data-lang="pt">Compilador de Dados</h4>
-            <p data-lang="en">Organize quantitative data from systematic reviews (LC50, EC50, IC50…). Standardize parameter names and build synthesis tables.</p>
-            <p data-lang="pt">Organize dados quantitativos de revisões sistemáticas (LC50, EC50, IC50…). Padronize nomes de parâmetros e monte tabelas de síntese.</p>
-          </div>
+          <div class="feat-body"><h4>Data Compiler</h4><p>Organize quantitative data from systematic reviews (LC50, EC50, IC50…). Standardize parameter names and build synthesis tables.</p></div>
         </div>
-
         <div class="feat-card">
           <div class="feat-icon">💾</div>
-          <div class="feat-body">
-            <h4 data-lang="en">Portable Projects</h4><h4 data-lang="pt">Projetos Portáteis</h4>
-            <p data-lang="en">Everything saved in a single <code>.sldm</code> file (SQLite). Easy to share, back up or migrate between computers.</p>
-            <p data-lang="pt">Tudo salvo em um único arquivo <code>.sldm</code> (SQLite). Fácil de compartilhar, fazer backup ou migrar entre computadores.</p>
-          </div>
+          <div class="feat-body"><h4>Portable Projects</h4><p>Everything saved in a single <code>.sldm</code> file (SQLite). Easy to share, back up or migrate between computers.</p></div>
         </div>
-
         <div class="feat-card">
           <div class="feat-icon">📝</div>
-          <div class="feat-body">
-            <h4 data-lang="en">Built-in CSV Editor</h4><h4 data-lang="pt">Editor CSV Integrado</h4>
-            <p data-lang="en">View and edit data tables directly inside the app, without opening external spreadsheets. Ideal for quick adjustments.</p>
-            <p data-lang="pt">Visualize e edite tabelas de dados diretamente no app, sem precisar abrir planilhas externas. Ideal para ajustes rápidos.</p>
-          </div>
+          <div class="feat-body"><h4>Built-in CSV Editor</h4><p>View and edit data tables directly inside the app, without opening external spreadsheets.</p></div>
         </div>
-
       </div>
 
-      <h3 style="font-size:1.2rem;margin-bottom:28px" data-lang="en">Typical workflow</h3>
-      <h3 style="font-size:1.2rem;margin-bottom:28px" data-lang="pt">Fluxo típico de uso</h3>
+      <h3 style="font-size:1.2rem;margin-bottom:28px">Typical workflow</h3>
       <div class="workflow">
-        <div class="wf-step"><div class="wf-num">1</div><div class="wf-body">
-          <h4 data-lang="en">Create a project</h4><h4 data-lang="pt">Crie um projeto</h4>
-          <p data-lang="en">Open SLDM and create a new project. A <code>.sldm</code> file will be created — it stores everything.</p>
-          <p data-lang="pt">Abra o SLDM e crie um novo projeto. Um arquivo <code>.sldm</code> será gerado — ele guarda tudo.</p>
-        </div></div>
-        <div class="wf-step"><div class="wf-num">2</div><div class="wf-body">
-          <h4 data-lang="en">Register your objects of interest</h4><h4 data-lang="pt">Cadastre seus objetos de interesse</h4>
-          <p data-lang="en">In the <em>Object List</em> tab, add compounds, species or genes. Include synonyms to improve automatic detection.</p>
-          <p data-lang="pt">Na aba <em>Object List</em>, adicione compostos, espécies ou genes. Inclua sinônimos para melhorar a detecção automática.</p>
-        </div></div>
-        <div class="wf-step"><div class="wf-num">3</div><div class="wf-body">
-          <h4 data-lang="en">Import your articles</h4><h4 data-lang="pt">Importe seus artigos</h4>
-          <p data-lang="en">In the <em>Article Mining</em> tab, add PDFs or paste texts. Use the <em>Scan</em> button to automatically detect which objects appear.</p>
-          <p data-lang="pt">Na aba <em>Article Mining</em>, adicione PDFs ou cole os textos. Use o botão <em>Scan</em> para detectar automaticamente quais objetos aparecem.</p>
-        </div></div>
-        <div class="wf-step"><div class="wf-num">4</div><div class="wf-body">
-          <h4 data-lang="en">Compile quantitative data</h4><h4 data-lang="pt">Compile os dados quantitativos</h4>
-          <p data-lang="en">In <em>Data Compiler</em>, enter values extracted from articles (doses, concentrations, etc.) and build review tables.</p>
-          <p data-lang="pt">No <em>Data Compiler</em>, insira os valores extraídos dos artigos (doses, concentrações, etc.) e monte tabelas de revisão.</p>
-        </div></div>
-        <div class="wf-step"><div class="wf-num">5</div><div class="wf-body">
-          <h4 data-lang="en">Generate visualizations</h4><h4 data-lang="pt">Gere visualizações</h4>
-          <p data-lang="en">In the <em>Visualization</em> tab, choose the chart type, configure axes and export the image ready for your paper.</p>
-          <p data-lang="pt">Na aba <em>Visualization</em>, escolha o tipo de gráfico, configure os eixos e exporte a imagem pronta para o seu artigo.</p>
-        </div></div>
+        <div class="wf-step"><div class="wf-num">1</div><div class="wf-body"><h4>Create a project</h4><p>Open SLDM and create a new project. A <code>.sldm</code> file will be created — it stores everything.</p></div></div>
+        <div class="wf-step"><div class="wf-num">2</div><div class="wf-body"><h4>Register your objects of interest</h4><p>In the <em>Object List</em> tab, add compounds, species or genes. Include synonyms to improve automatic detection.</p></div></div>
+        <div class="wf-step"><div class="wf-num">3</div><div class="wf-body"><h4>Import your articles</h4><p>In the <em>Article Mining</em> tab, add PDFs or paste texts. Use <em>Scan</em> to automatically detect which objects appear.</p></div></div>
+        <div class="wf-step"><div class="wf-num">4</div><div class="wf-body"><h4>Compile quantitative data</h4><p>In <em>Data Compiler</em>, enter values extracted from articles (doses, concentrations, etc.) and build review tables.</p></div></div>
+        <div class="wf-step"><div class="wf-num">5</div><div class="wf-body"><h4>Generate visualizations</h4><p>In the <em>Visualization</em> tab, choose the chart type, configure axes and export the image ready for your paper.</p></div></div>
       </div>
 
-      <!-- CSV -->
       <div style="margin-top:56px">
-        <h3 style="font-size:1.2rem;margin-bottom:8px" data-lang="en">Importing data via CSV</h3>
-        <h3 style="font-size:1.2rem;margin-bottom:8px" data-lang="pt">Importando dados via CSV</h3>
-        <p style="font-size:.95rem;color:var(--ink-2);line-height:1.7;max-width:680px;margin-bottom:32px" data-lang="en">SLDM supports <code>.csv</code> import to speed up bulk registration of objects and review data. Below are the specifications for each supported file.</p>
-        <p style="font-size:.95rem;color:var(--ink-2);line-height:1.7;max-width:680px;margin-bottom:32px" data-lang="pt">O SLDM aceita importação em formato <code>.csv</code> para agilizar o cadastro em massa de objetos e dados de revisão. Abaixo estão as especificações de cada arquivo suportado.</p>
-
+        <h3 style="font-size:1.2rem;margin-bottom:8px">Importing data via CSV</h3>
+        <p style="font-size:.95rem;color:var(--ink-2);line-height:1.7;max-width:680px;margin-bottom:32px">SLDM supports <code>.csv</code> import to speed up bulk registration of objects and review data.</p>
         <div style="display:flex;flex-direction:column;gap:20px;max-width:860px">
-
-          <!-- Objects CSV -->
           <div class="csv-block">
             <div class="csv-header">
               <div class="csv-icon" style="background:var(--lavender)">📋</div>
-              <div>
-                <div style="font-weight:500;font-size:.95rem"><span data-lang="en">Objects CSV</span><span data-lang="pt">CSV de Objetos</span></div>
-                <div style="font-size:.75rem;color:var(--ink-3);font-family:'DM Mono',monospace;margin-top:2px">File → Import Objects CSV</div>
-              </div>
+              <div><div style="font-weight:500;font-size:.95rem">Objects CSV</div><div style="font-size:.75rem;color:var(--ink-3);font-family:'DM Mono',monospace;margin-top:2px">File → Import Objects CSV</div></div>
             </div>
             <div class="csv-body">
-              <p style="font-size:.875rem;color:var(--ink-2);line-height:1.65;margin-bottom:16px" data-lang="en">Use this file to register the objects SLDM will track in articles. Each row is a distinct object. The <strong>object</strong> and <strong>category</strong> fields are required; others are optional but strongly recommended to improve detection accuracy.</p>
-              <p style="font-size:.875rem;color:var(--ink-2);line-height:1.65;margin-bottom:16px" data-lang="pt">Use este arquivo para cadastrar os objetos que o SLDM irá rastrear nos artigos. Cada linha representa um objeto distinto. Os campos <strong>object</strong> e <strong>category</strong> são obrigatórios; os demais são opcionais, mas fortemente recomendados para melhorar a precisão da detecção automática.</p>
-              <div class="csv-schema">
-                <div class="csv-schema-lbl"><span data-lang="en">expected header</span><span data-lang="pt">cabeçalho esperado</span></div>
-                <div class="csv-schema-val">object, category, subcategory, synonyms, notes</div>
-              </div>
+              <div class="csv-schema"><div class="csv-schema-lbl">expected header</div><div class="csv-schema-val">object, category, subcategory, synonyms, notes</div></div>
               <div class="csv-fields">
-                <div class="csv-field"><div class="csv-fname" style="color:var(--lavender-d)">object <span class="req"><span data-lang="en">required</span><span data-lang="pt">obrigatório</span></span></div><div class="csv-fdesc" data-lang="en">Primary object name. Used as the identifier throughout the system.</div><div class="csv-fdesc" data-lang="pt">Nome principal do objeto. Será o identificador usado em todo o sistema.</div></div>
-                <div class="csv-field"><div class="csv-fname" style="color:var(--lavender-d)">category <span class="req"><span data-lang="en">required</span><span data-lang="pt">obrigatório</span></span></div><div class="csv-fdesc" data-lang="en">Broad classification. Used for filtering and grouping in analysis modules.</div><div class="csv-fdesc" data-lang="pt">Classificação ampla. Usada para filtrar e agrupar nos módulos de análise.</div></div>
-                <div class="csv-field"><div class="csv-fname" style="color:var(--sky-d)">subcategory</div><div class="csv-fdesc" data-lang="en">Sub-division within the category for additional granularity.</div><div class="csv-fdesc" data-lang="pt">Subdivisão da categoria para granularidade adicional.</div></div>
-                <div class="csv-field"><div class="csv-fname" style="color:var(--sky-d)">synonyms</div><div class="csv-fdesc" data-lang="en">Alternative names, comma-separated inside double quotes. Broaden text recognition.</div><div class="csv-fdesc" data-lang="pt">Nomes alternativos, separados por vírgula dentro de aspas duplas. Ampliam o reconhecimento nos textos.</div></div>
-                <div class="csv-field"><div class="csv-fname" style="color:var(--sky-d)">notes</div><div class="csv-fdesc" data-lang="en">Free-text notes. Does not affect mining.</div><div class="csv-fdesc" data-lang="pt">Campo livre para anotações internas. Não afeta a mineração.</div></div>
+                <div class="csv-field"><div class="csv-fname" style="color:var(--lavender-d)">object <span class="req">required</span></div><div class="csv-fdesc">Primary name used as the identifier throughout the system.</div></div>
+                <div class="csv-field"><div class="csv-fname" style="color:var(--lavender-d)">category <span class="req">required</span></div><div class="csv-fdesc">Broad classification used for filtering and grouping.</div></div>
+                <div class="csv-field"><div class="csv-fname" style="color:var(--sky-d)">subcategory</div><div class="csv-fdesc">Sub-division within the category.</div></div>
+                <div class="csv-field"><div class="csv-fname" style="color:var(--sky-d)">synonyms</div><div class="csv-fdesc">Alternative names, comma-separated inside double quotes.</div></div>
+                <div class="csv-field"><div class="csv-fname" style="color:var(--sky-d)">notes</div><div class="csv-fdesc">Free-text notes. Does not affect mining.</div></div>
               </div>
-              <p style="font-size:.78rem;color:var(--ink-3);margin-top:14px;font-style:italic" data-lang="en">⚠ Synonyms containing commas must be double-quoted: <span style="font-family:'DM Mono',monospace">"name A, name B"</span></p>
-              <p style="font-size:.78rem;color:var(--ink-3);margin-top:14px;font-style:italic" data-lang="pt">⚠ Sinônimos com vírgula devem estar entre aspas duplas: <span style="font-family:'DM Mono',monospace">"nome A, nome B"</span></p>
             </div>
           </div>
-
-          <!-- Review Data CSV -->
           <div class="csv-block">
             <div class="csv-header">
               <div class="csv-icon" style="background:var(--mint)">🗃️</div>
-              <div>
-                <div style="font-weight:500;font-size:.95rem"><span data-lang="en">Review Data CSV</span><span data-lang="pt">CSV de Dados de Revisão</span></div>
-                <div style="font-size:.75rem;color:var(--ink-3);font-family:'DM Mono',monospace;margin-top:2px">Data Compiler</div>
-              </div>
+              <div><div style="font-weight:500;font-size:.95rem">Review Data CSV</div><div style="font-size:.75rem;color:var(--ink-3);font-family:'DM Mono',monospace;margin-top:2px">Data Compiler</div></div>
             </div>
             <div class="csv-body">
-              <p style="font-size:.875rem;color:var(--ink-2);line-height:1.65;margin-bottom:16px" data-lang="en">Use this file to import quantitative data extracted from articles — toxicity values, doses, concentrations or any numerical parameter. Each row represents one measurement of a parameter for an object in a specific article.</p>
-              <p style="font-size:.875rem;color:var(--ink-2);line-height:1.65;margin-bottom:16px" data-lang="pt">Use este arquivo para importar dados quantitativos extraídos dos artigos — valores de toxicidade, doses, concentrações ou qualquer parâmetro numérico. Cada linha representa uma medição de um parâmetro para um objeto em um artigo específico.</p>
-              <div class="csv-schema">
-                <div class="csv-schema-lbl"><span data-lang="en">expected header</span><span data-lang="pt">cabeçalho esperado</span></div>
-                <div class="csv-schema-val">object, parameter, value, unit, species, article, notes</div>
-              </div>
+              <div class="csv-schema"><div class="csv-schema-lbl">expected header</div><div class="csv-schema-val">object, parameter, value, unit, species, article, notes</div></div>
               <div class="csv-fields">
-                <div class="csv-field"><div class="csv-fname" style="color:var(--mint-d)">object <span class="req"><span data-lang="en">required</span><span data-lang="pt">obrigatório</span></span></div><div class="csv-fdesc" data-lang="en">Object name as registered in the Object List. Must match exactly.</div><div class="csv-fdesc" data-lang="pt">Nome do objeto conforme cadastrado na Object List. Deve haver correspondência exata.</div></div>
-                <div class="csv-field"><div class="csv-fname" style="color:var(--mint-d)">parameter <span class="req"><span data-lang="en">required</span><span data-lang="pt">obrigatório</span></span></div><div class="csv-fdesc" data-lang="en">Measured parameter name. Data Compiler lets you standardize variants.</div><div class="csv-fdesc" data-lang="pt">Nome do parâmetro medido. O Data Compiler permite padronizar variantes.</div></div>
-                <div class="csv-field"><div class="csv-fname" style="color:var(--mint-d)">value <span class="req"><span data-lang="en">required</span><span data-lang="pt">obrigatório</span></span></div><div class="csv-fdesc" data-lang="en">Numeric value. Use a dot as decimal separator.</div><div class="csv-fdesc" data-lang="pt">Valor numérico. Use ponto como separador decimal.</div></div>
-                <div class="csv-field"><div class="csv-fname" style="color:var(--amber-d)">unit</div><div class="csv-fdesc" data-lang="en">Measurement unit. Recommended for consistent visualizations.</div><div class="csv-fdesc" data-lang="pt">Unidade da medição. Recomendado para consistência nas visualizações.</div></div>
-                <div class="csv-field"><div class="csv-fname" style="color:var(--amber-d)">species</div><div class="csv-fdesc" data-lang="en">Organism or study model. Useful for chart filters and groupings.</div><div class="csv-fdesc" data-lang="pt">Organismo ou modelo de estudo. Útil para filtros e agrupamentos nos gráficos.</div></div>
-                <div class="csv-field"><div class="csv-fname" style="color:var(--amber-d)">article</div><div class="csv-fdesc" data-lang="en">Source article reference. Enables tracing each value to its origin.</div><div class="csv-fdesc" data-lang="pt">Referência ao artigo de origem. Permite rastrear de onde cada valor foi extraído.</div></div>
-                <div class="csv-field"><div class="csv-fname" style="color:var(--amber-d)">notes</div><div class="csv-fdesc" data-lang="en">Free-text notes on the measurement or experimental conditions.</div><div class="csv-fdesc" data-lang="pt">Campo livre para observações sobre a medição ou condições experimentais.</div></div>
+                <div class="csv-field"><div class="csv-fname" style="color:var(--mint-d)">object <span class="req">required</span></div><div class="csv-fdesc">Must match exactly the name in the Object List.</div></div>
+                <div class="csv-field"><div class="csv-fname" style="color:var(--mint-d)">parameter <span class="req">required</span></div><div class="csv-fdesc">Measured parameter name (e.g. LC50, EC50).</div></div>
+                <div class="csv-field"><div class="csv-fname" style="color:var(--mint-d)">value <span class="req">required</span></div><div class="csv-fdesc">Numeric value. Use dot as decimal separator.</div></div>
+                <div class="csv-field"><div class="csv-fname" style="color:var(--amber-d)">unit</div><div class="csv-fdesc">Measurement unit.</div></div>
+                <div class="csv-field"><div class="csv-fname" style="color:var(--amber-d)">species</div><div class="csv-fdesc">Organism or study model.</div></div>
+                <div class="csv-field"><div class="csv-fname" style="color:var(--amber-d)">article</div><div class="csv-fdesc">Source article reference.</div></div>
               </div>
             </div>
           </div>
-
         </div>
       </div>
-    </div><!-- /tab-user -->
+    </div>
 
-    <!-- TAB TECH -->
     <div id="tab-tech" class="tab-panel">
       <div class="tech-grid">
-
-        <div class="tech-block">
-          <h4 data-lang="en">Graphical interface</h4><h4 data-lang="pt">Interface gráfica</h4>
-          <p data-lang="en">SLDM uses <strong>PyQt5</strong> as its UI framework, with a tab-based main window (<code>QTabWidget</code>). The visual theme is applied globally via QSS (Qt Style Sheets) for a consistent look.</p>
-          <p data-lang="pt">O SLDM usa <strong>PyQt5</strong> como framework de UI, com uma janela principal baseada em abas (<code>QTabWidget</code>). O tema visual é aplicado globalmente via QSS, garantindo aparência consistente.</p>
-          <div class="pill-list"><span class="pill">PyQt5</span><span class="pill">QTabWidget</span><span class="pill">QSS</span><span class="pill">Qt5</span></div>
-        </div>
-
-        <div class="tech-block">
-          <h4 data-lang="en">Database</h4><h4 data-lang="pt">Banco de dados</h4>
-          <p data-lang="en">All data — articles, objects, parameters and reviews — is stored in a <strong>SQLite</strong> database embedded in the <code>.sldm</code> file. The access layer (<code>database.py</code>) abstracts all queries.</p>
-          <p data-lang="pt">Todos os dados — artigos, objetos, parâmetros e revisões — são armazenados em um banco <strong>SQLite</strong> embutido no arquivo <code>.sldm</code>. A camada de acesso (<code>database.py</code>) abstrai todas as queries.</p>
-          <div class="pill-list"><span class="pill">SQLite</span><span class="pill">sqlite3</span><span class="pill" data-lang="en">single file</span><span class="pill" data-lang="pt">arquivo único</span></div>
-        </div>
-
-        <div class="tech-block">
-          <h4 data-lang="en">Text extraction &amp; mining</h4><h4 data-lang="pt">Extração de texto &amp; mineração</h4>
-          <p data-lang="en">PDFs are processed via <strong>PyMuPDF (fitz)</strong>, extracting raw text from each page. The scanner searches the text for registered objects and synonyms using normalised regex matching.</p>
-          <p data-lang="pt">PDFs são processados via <strong>PyMuPDF (fitz)</strong>, extraindo o texto bruto de cada página. O scanner busca os objetos cadastrados e seus sinônimos usando correspondência por regex normalizada.</p>
-          <div class="pill-list"><span class="pill">PyMuPDF</span><span class="pill">fitz</span><span class="pill">regex</span><span class="pill" data-lang="en">basic NLP</span><span class="pill" data-lang="pt">NLP básico</span></div>
-        </div>
-
-        <div class="tech-block">
-          <h4 data-lang="en">Data visualization</h4><h4 data-lang="pt">Visualização de dados</h4>
-          <p data-lang="en">Charts are rendered with <strong>Matplotlib</strong> embedded in PyQt via <code>FigureCanvasQTAgg</code>. <strong>Pandas</strong> manages intermediate DataFrames used to aggregate and pivot data before plotting.</p>
-          <p data-lang="pt">Os gráficos são renderizados com <strong>Matplotlib</strong> embutido via <code>FigureCanvasQTAgg</code>. O <strong>Pandas</strong> gerencia os DataFrames intermediários usados para agregar e pivotar os dados.</p>
-          <div class="pill-list"><span class="pill">Matplotlib</span><span class="pill">FigureCanvasQTAgg</span><span class="pill">Pandas</span><span class="pill">DataFrame</span></div>
-        </div>
-
+        <div class="tech-block"><h4>Graphical interface</h4><p>SLDM uses <strong>PyQt5</strong> as its UI framework, with a tab-based main window (<code>QTabWidget</code>). The visual theme is applied globally via QSS.</p><div class="pill-list"><span class="pill">PyQt5</span><span class="pill">QTabWidget</span><span class="pill">QSS</span></div></div>
+        <div class="tech-block"><h4>Database</h4><p>All data is stored in a <strong>SQLite</strong> database embedded in the <code>.sldm</code> file. The access layer (<code>database.py</code>) abstracts all queries.</p><div class="pill-list"><span class="pill">SQLite</span><span class="pill">sqlite3</span></div></div>
+        <div class="tech-block"><h4>Text extraction &amp; mining</h4><p>PDFs are processed via <strong>PyMuPDF (fitz)</strong>. The scanner finds registered objects and synonyms using normalised regex matching.</p><div class="pill-list"><span class="pill">PyMuPDF</span><span class="pill">fitz</span><span class="pill">regex</span></div></div>
+        <div class="tech-block"><h4>Data visualization</h4><p>Charts rendered with <strong>Matplotlib</strong> embedded via <code>FigureCanvasQTAgg</code>. <strong>Pandas</strong> manages intermediate DataFrames.</p><div class="pill-list"><span class="pill">Matplotlib</span><span class="pill">Pandas</span><span class="pill">FigureCanvasQTAgg</span></div></div>
         <div class="arch-diagram">
-          <h4 data-lang="en">System architecture</h4><h4 data-lang="pt">Arquitetura do sistema</h4>
+          <h4>System architecture</h4>
           <div class="arch-flow">
-            <div class="arch-box"><span class="arch-label"><span data-lang="en">input</span><span data-lang="pt">entrada</span></span><span class="arch-name">PDF / CSV / <span data-lang="en">text</span><span data-lang="pt">texto</span></span></div>
+            <div class="arch-box"><span class="arch-label">input</span><span class="arch-name">PDF / CSV / text</span></div>
             <span class="arch-arrow">→</span>
-            <div class="arch-box"><span class="arch-label"><span data-lang="en">extraction</span><span data-lang="pt">extração</span></span><span class="arch-name">PyMuPDF</span></div>
+            <div class="arch-box"><span class="arch-label">extraction</span><span class="arch-name">PyMuPDF</span></div>
             <span class="arch-arrow">→</span>
-            <div class="arch-box"><span class="arch-label"><span data-lang="en">persistence</span><span data-lang="pt">persistência</span></span><span class="arch-name">SQLite .sldm</span></div>
+            <div class="arch-box"><span class="arch-label">persistence</span><span class="arch-name">SQLite .sldm</span></div>
             <span class="arch-arrow">→</span>
-            <div class="arch-box"><span class="arch-label"><span data-lang="en">analysis</span><span data-lang="pt">análise</span></span><span class="arch-name">Pandas</span></div>
+            <div class="arch-box"><span class="arch-label">analysis</span><span class="arch-name">Pandas</span></div>
             <span class="arch-arrow">→</span>
-            <div class="arch-box"><span class="arch-label"><span data-lang="en">output</span><span data-lang="pt">saída</span></span><span class="arch-name">Matplotlib / UI</span></div>
+            <div class="arch-box"><span class="arch-label">output</span><span class="arch-name">Matplotlib / UI</span></div>
           </div>
         </div>
-
       </div>
     </div>
-
   </div>
 </section>
 
-<!-- SCREENSHOTS -->
-<section id="screenshots">
+<section id="howto">
   <div class="section-inner">
-    <p class="section-label">Interface</p>
-    <h2 class="section-title" data-lang="en">See SLDM in action</h2>
-    <h2 class="section-title" data-lang="pt">Veja o SLDM em ação</h2>
-    <p class="section-lead" data-lang="en">Screenshots from the interface in real use. Replace the placeholders below with your own captures.</p>
-    <p class="section-lead" data-lang="pt">Capturas da interface em uso real. Substitua as imagens abaixo pelas suas próprias.</p>
-    <div class="screenshots-grid">
+    <p class="section-label">User Guide</p>
+    <h2 class="section-title">How to use each tab</h2>
+    <p class="section-lead">SLDM is organized in four main tabs. Click a tab below to see step-by-step instructions and tips.</p>
 
-      <div class="shot-card">
-        <div class="shot-img"><span class="shot-icon">📋</span><span data-lang="en">Screenshot here<br/><span style="font-size:.68rem">Suggestion: Object List tab with registered objects</span></span><span data-lang="pt">Captura aqui<br/><span style="font-size:.68rem">Sugestão: aba Object List com objetos cadastrados</span></span></div>
-        <div class="shot-caption"><span data-lang="en">Object List</span><span data-lang="pt">Lista de Objetos</span></div>
-        <div class="shot-sub"><span data-lang="en">Compound registration with categories and synonyms</span><span data-lang="pt">Cadastro de compostos com categorias e sinônimos</span></div>
+    <div class="module-tabs">
+      <button class="mod-btn active" onclick="switchMod('objects', this)"><span class="m-icon">📋</span><span class="m-name">Object List</span></button>
+      <button class="mod-btn" onclick="switchMod('mining', this)"><span class="m-icon">🔍</span><span class="m-name">Article Mining</span></button>
+      <button class="mod-btn" onclick="switchMod('viz', this)"><span class="m-icon">📊</span><span class="m-name">Visualization</span></button>
+      <button class="mod-btn" onclick="switchMod('compiler', this)"><span class="m-icon">🗃️</span><span class="m-name">Data Compiler</span></button>
+    </div>
+
+    <div id="mod-objects" class="mod-panel active">
+      <div class="mod-content">
+        <div class="mod-left">
+          <h3>📋 Object List</h3>
+          <p class="mod-desc">This is the foundation of your project. Here you register all the entities — compounds, species, genes, pharmaceuticals, pollutants — that SLDM should look for when scanning articles. The more complete your object list, the better the automatic detection.</p>
+          <div class="mod-steps">
+            <div class="mod-step"><div class="mod-step-num" style="background:var(--lavender-d)">1</div><div><strong>Add objects manually or via CSV</strong><p>Click <em>Add Object</em> to create a new entry with name, category, and optionally subcategory. Or go to <em>File → Import Objects CSV</em> to load multiple objects at once.</p></div></div>
+            <div class="mod-step"><div class="mod-step-num" style="background:var(--lavender-d)">2</div><div><strong>Add synonyms to improve detection</strong><p>Select any object and click <em>Edit</em>. In the synonyms field, add alternative names separated by comma (e.g. <code>ATZ, 2-chloro-4-ethylamine</code>). SLDM uses all synonyms during scanning.</p></div></div>
+            <div class="mod-step"><div class="mod-step-num" style="background:var(--lavender-d)">3</div><div><strong>Organize with categories</strong><p>Use consistent category names (e.g. <code>pesticide</code>, <code>drug</code>, <code>species</code>). Categories are used later to filter and group results in the Visualization and Compiler modules.</p></div></div>
+            <div class="mod-step"><div class="mod-step-num" style="background:var(--lavender-d)">4</div><div><strong>Export the list anytime</strong><p>Use <em>File → Export Objects CSV</em> to save a copy. Useful to reuse the same list across different projects.</p></div></div>
+          </div>
+        </div>
+        <div class="mod-right">
+          <div class="tips-title">Tips &amp; notes</div>
+          <div class="tip"><strong>Synonyms with commas</strong>If a synonym contains a comma, wrap it in double quotes in the CSV: <code>"name A, name B"</code>. This avoids column misalignment during import.</div>
+          <div class="tip"><strong>Case-insensitive matching</strong>SLDM normalizes text before scanning, so <code>Atrazine</code>, <code>ATRAZINE</code> and <code>atrazine</code> all match the same object.</div>
+          <div class="tip"><strong>Reuse across projects</strong>Export your object list as CSV and import it into a new project. This saves time when starting similar reviews.</div>
+        </div>
       </div>
+    </div>
 
-      <div class="shot-card">
-        <div class="shot-img"><span class="shot-icon">🔍</span><span data-lang="en">Screenshot here<br/><span style="font-size:.68rem">Suggestion: Article Mining tab with loaded PDFs</span></span><span data-lang="pt">Captura aqui<br/><span style="font-size:.68rem">Sugestão: aba Article Mining com PDFs carregados</span></span></div>
-        <div class="shot-caption"><span data-lang="en">Article Mining</span><span data-lang="pt">Mineração de Artigos</span></div>
-        <div class="shot-sub"><span data-lang="en">Automatic detection of objects in texts</span><span data-lang="pt">Detecção automática de objetos nos textos</span></div>
+    <div id="mod-mining" class="mod-panel">
+      <div class="mod-content">
+        <div class="mod-left">
+          <h3>🔍 Article Mining</h3>
+          <p class="mod-desc">This tab is your bibliographic library. Add the articles of your systematic review, then run the automatic scanner to detect which registered objects appear in each article — by PDF, pasted text, or any combination.</p>
+          <div class="mod-steps">
+            <div class="mod-step"><div class="mod-step-num" style="background:var(--sky-d)">1</div><div><strong>Add an article</strong><p>Click <em>Add Article</em>. Fill in metadata manually or paste the article text directly. To load a PDF, click <em>Attach PDF</em> — SLDM extracts the text automatically via PyMuPDF.</p></div></div>
+            <div class="mod-step"><div class="mod-step-num" style="background:var(--sky-d)">2</div><div><strong>Fetch metadata from DOI</strong><p>Paste the DOI and click <em>Fetch Metadata</em>. SLDM queries Crossref and automatically fills in title, authors, journal and year.</p></div></div>
+            <div class="mod-step"><div class="mod-step-num" style="background:var(--sky-d)">3</div><div><strong>Scan for objects</strong><p>Select one or more articles (or all with Ctrl+A) and click <em>Scan</em>. SLDM searches the text for all objects and synonyms from your Object List.</p></div></div>
+            <div class="mod-step"><div class="mod-step-num" style="background:var(--sky-d)">4</div><div><strong>Review the results</strong><p>Click on any article to see which objects were detected, in which paragraphs, and with what frequency. Add or remove detections manually if needed.</p></div></div>
+          </div>
+        </div>
+        <div class="mod-right">
+          <div class="tips-title">Tips &amp; notes</div>
+          <div class="tip"><strong>Scan all at once</strong>After adding all your articles, press Ctrl+A to select all, then click Scan. SLDM processes each article sequentially — ideal for large batches.</div>
+          <div class="tip"><strong>No PDF? Use paste text</strong>Copy the abstract or full text from the publisher's website and paste it directly into the article's text field. Scanning works exactly the same way.</div>
+          <div class="tip"><strong>Crossref requires internet</strong>The Fetch Metadata function requires an active internet connection. All other features work fully offline.</div>
+        </div>
       </div>
+    </div>
 
-      <div class="shot-card">
-        <div class="shot-img"><span class="shot-icon">📊</span><span data-lang="en">Screenshot here<br/><span style="font-size:.68rem">Suggestion: Visualization tab with generated chart</span></span><span data-lang="pt">Captura aqui<br/><span style="font-size:.68rem">Sugestão: aba Visualization com gráfico gerado</span></span></div>
-        <div class="shot-caption"><span data-lang="en">Visualizations</span><span data-lang="pt">Visualizações</span></div>
-        <div class="shot-sub"><span data-lang="en">Dashboard and exportable charts</span><span data-lang="pt">Dashboard e gráficos exportáveis</span></div>
+    <div id="mod-viz" class="mod-panel">
+      <div class="mod-content">
+        <div class="mod-left">
+          <h3>📊 Visualization</h3>
+          <p class="mod-desc">Build publication-ready charts directly from your project data. Choose the data source, chart type, configure axes and filters, and export in high resolution.</p>
+          <div class="mod-steps">
+            <div class="mod-step"><div class="mod-step-num" style="background:var(--mint-d)">1</div><div><strong>Choose the data source</strong><p>Select whether to plot data from <em>Article Mining</em> (citation counts, object co-occurrences) or from <em>Data Compiler</em> (quantitative parameters like LC50, EC50).</p></div></div>
+            <div class="mod-step"><div class="mod-step-num" style="background:var(--mint-d)">2</div><div><strong>Select chart type and axes</strong><p>Choose from bar, line, scatter, heatmap or pie. Configure X and Y axes using the available fields — object name, category, parameter, value, year, journal, etc.</p></div></div>
+            <div class="mod-step"><div class="mod-step-num" style="background:var(--mint-d)">3</div><div><strong>Apply filters</strong><p>Use the filter panel to restrict the data by category, year range, specific objects or parameters. Changes update the chart preview in real time.</p></div></div>
+            <div class="mod-step"><div class="mod-step-num" style="background:var(--mint-d)">4</div><div><strong>Export the chart</strong><p>Click <em>Export</em> to save as PNG or SVG at your desired resolution. Ready for papers, presentations or reports.</p></div></div>
+          </div>
+        </div>
+        <div class="mod-right">
+          <div class="tips-title">Tips &amp; notes</div>
+          <div class="tip"><strong>Heatmaps for co-occurrence</strong>The heatmap type is ideal for visualizing which objects co-occur most frequently across articles. Set X and Y to different object categories for a matrix view.</div>
+          <div class="tip"><strong>Export at 300 dpi</strong>For journal submissions, export as PNG with 300 DPI or higher. Use SVG for vector figures that can be resized without quality loss.</div>
+          <div class="tip"><strong>Chart configs are saved</strong>Chart configurations are stored inside the <code>.sldm</code> project file, so you can reopen and tweak them without starting from scratch.</div>
+        </div>
       </div>
+    </div>
 
-      <div class="shot-card">
-        <div class="shot-img"><span class="shot-icon">🗃️</span><span data-lang="en">Screenshot here<br/><span style="font-size:.68rem">Suggestion: Data Compiler tab with LC50 table</span></span><span data-lang="pt">Captura aqui<br/><span style="font-size:.68rem">Sugestão: aba Data Compiler com tabela de LC50</span></span></div>
-        <div class="shot-caption"><span data-lang="en">Data Compiler</span><span data-lang="pt">Compilador de Dados</span></div>
-        <div class="shot-sub"><span data-lang="en">Review tables with parameter standardization</span><span data-lang="pt">Tabelas de revisão com padronização de parâmetros</span></div>
+    <div id="mod-compiler" class="mod-panel">
+      <div class="mod-content">
+        <div class="mod-left">
+          <h3>🗃️ Data Compiler</h3>
+          <p class="mod-desc">Organize quantitative data extracted from your articles — toxicity values, doses, concentrations, effect measurements. Standardize parameter names, eliminate duplicates, and build synthesis tables ready for statistical analysis.</p>
+          <div class="mod-steps">
+            <div class="mod-step"><div class="mod-step-num" style="background:var(--amber-d)">1</div><div><strong>Add data entries manually or via CSV</strong><p>Click <em>Add Entry</em> and fill in the object, parameter, value, unit, species and source article. Or import a <code>review_data.csv</code> file with multiple records at once.</p></div></div>
+            <div class="mod-step"><div class="mod-step-num" style="background:var(--amber-d)">2</div><div><strong>Standardize parameter names</strong><p>Use the <em>Standardize Parameters</em> tool to merge variants like <code>LC50</code>, <code>LC 50</code> and <code>LC-50</code> into a single canonical name. Always do this before filtering or plotting.</p></div></div>
+            <div class="mod-step"><div class="mod-step-num" style="background:var(--amber-d)">3</div><div><strong>Filter and inspect your data</strong><p>Use the filter panel to show entries for a specific object, parameter, species or article. Edit or delete entries directly in the table.</p></div></div>
+            <div class="mod-step"><div class="mod-step-num" style="background:var(--amber-d)">4</div><div><strong>Export the compiled table</strong><p>Click <em>Export CSV</em> to download the full dataset. The file can be used directly in R, Python or any statistical software.</p></div></div>
+          </div>
+        </div>
+        <div class="mod-right">
+          <div class="tips-title">Tips &amp; notes</div>
+          <div class="tip"><strong>Standardize before visualizing</strong>Always run parameter standardization before opening the Visualization tab. Inconsistent names will split your data into separate series and produce misleading charts.</div>
+          <div class="tip"><strong>Use the article field for traceability</strong>Fill in the <em>article</em> field consistently for every entry. This lets you trace each data point back to its source — essential for systematic review methodology.</div>
+          <div class="tip"><strong>Decimal separator</strong>Always use a dot (<code>.</code>) as the decimal separator when entering or importing values. Commas will cause parsing errors.</div>
+        </div>
       </div>
-
-      <div class="shot-card">
-        <div class="shot-img"><span class="shot-icon">📝</span><span data-lang="en">Screenshot here<br/><span style="font-size:.68rem">Suggestion: CSV editor open with data</span></span><span data-lang="pt">Captura aqui<br/><span style="font-size:.68rem">Sugestão: editor CSV aberto com dados</span></span></div>
-        <div class="shot-caption"><span data-lang="en">CSV Editor</span><span data-lang="pt">Editor CSV</span></div>
-        <div class="shot-sub"><span data-lang="en">Edit tables without leaving the app</span><span data-lang="pt">Edição de tabelas sem sair do app</span></div>
-      </div>
-
-      <div class="shot-card">
-        <div class="shot-img"><span class="shot-icon">💾</span><span data-lang="en">Screenshot here<br/><span style="font-size:.68rem">Suggestion: file explorer with .sldm or export screen</span></span><span data-lang="pt">Captura aqui<br/><span style="font-size:.68rem">Sugestão: explorador de arquivos .sldm ou tela de export</span></span></div>
-        <div class="shot-caption"><span data-lang="en">Portable Projects</span><span data-lang="pt">Projetos Portáteis</span></div>
-        <div class="shot-sub"><span data-lang="en">Single .sldm file with the entire project</span><span data-lang="pt">Arquivo único .sldm com todo o projeto</span></div>
-      </div>
-
     </div>
   </div>
 </section>
 
-<!-- ABOUT -->
 <section id="about">
   <div class="section-inner">
     <div class="about-grid">
       <div class="about-text">
-        <p class="section-label" data-lang="en">About the project</p>
-        <p class="section-label" data-lang="pt">Sobre o projeto</p>
+        <p class="section-label">About the project</p>
         <h2 class="section-title" style="margin-bottom:24px">SLDM</h2>
-        <p data-lang="en">SLDM was born from the practical need to organize large volumes of scientific literature in systematic reviews of toxicology and ecotoxicology, where manually identifying the presence of hundreds of compounds across dozens of articles is a slow and error-prone process.</p>
-        <p data-lang="pt">O SLDM nasceu da necessidade prática de organizar grandes volumes de literatura científica em revisões sistemáticas de toxicologia e ecotoxicologia, onde identificar manualmente a presença de centenas de compostos em dezenas de artigos é um processo lento e sujeito a erros.</p>
-        <p data-lang="en">The software was developed entirely in Python, with a focus on usability for researchers without a technical programming background. The interface was designed to reflect the natural flow of a bibliographic review: register → mine → compile → visualize.</p>
-        <p data-lang="pt">O software foi desenvolvido integralmente em Python, com foco em usabilidade para pesquisadores sem formação técnica em programação. A interface foi projetada para refletir o fluxo natural de uma revisão bibliográfica: cadastrar → minerar → compilar → visualizar.</p>
-        <p data-lang="en">Distributed as a standalone executable requiring no environment setup, SLDM can be used immediately on any Windows computer.</p>
-        <p data-lang="pt">Distribuído como executável independente, sem necessidade de configuração de ambiente, o SLDM pode ser usado imediatamente em qualquer computador Windows.</p>
+        <p>SLDM was born from the practical need to organize large volumes of scientific literature in systematic reviews of toxicology and ecotoxicology, where manually identifying the presence of hundreds of compounds across dozens of articles is a slow and error-prone process.</p>
+        <p>The software was developed entirely in Python, with a focus on usability for researchers without a technical programming background. The interface reflects the natural flow of a bibliographic review: register → mine → compile → visualize.</p>
+        <p>Distributed as a standalone executable requiring no environment setup, SLDM can be used immediately on any Windows computer.</p>
       </div>
-
       <div>
-        <div class="registro-card">
-          <h3 data-lang="en">Software Registration</h3>
-          <h3 data-lang="pt">Registro de Software</h3>
-          <p class="reg-sub" data-lang="en">Legal protection · Law nº 9.609/1998 (Brazil)</p>
-          <p class="reg-sub" data-lang="pt">Proteção legal · Lei nº 9.609/1998 (Brasil)</p>
-
-          <div class="reg-row">
-            <span class="reg-key"><span data-lang="en">Name</span><span data-lang="pt">Nome</span></span>
-            <span class="reg-val">SLDM</span>
-          </div>
-          <div class="reg-row">
-            <span class="reg-key"><span data-lang="en">Full name</span><span data-lang="pt">Nome completo</span></span>
-            <span class="reg-val" style="font-size:.75rem">Scientific Literature Data Miner</span>
-          </div>
-          <div class="reg-row">
-            <span class="reg-key"><span data-lang="en">Version</span><span data-lang="pt">Versão</span></span>
-            <span class="reg-val">1.0.0</span>
-          </div>
-          <div class="reg-row">
-            <span class="reg-key"><span data-lang="en">Language</span><span data-lang="pt">Linguagem</span></span>
-            <span class="reg-val">Python 3</span>
-          </div>
-          <div class="reg-row">
-            <span class="reg-key"><span data-lang="en">Registry body</span><span data-lang="pt">Órgão de registro</span></span>
-            <span class="reg-val">##</span>
-          </div>
-          <div class="reg-row">
-            <span class="reg-key"><span data-lang="en">Registration number</span><span data-lang="pt">Número de registro</span></span>
-            <span class="reg-pending"><span data-lang="en">## to be filled</span><span data-lang="pt">## a preencher</span></span>
-          </div>
-          <div class="reg-row">
-            <span class="reg-key"><span data-lang="en">Registration date</span><span data-lang="pt">Data de registro</span></span>
-            <span class="reg-pending"><span data-lang="en">## to be filled</span><span data-lang="pt">## a preencher</span></span>
-          </div>
-          <div class="reg-row">
-            <span class="reg-key"><span data-lang="en">Rights holder</span><span data-lang="pt">Titular dos direitos</span></span>
-            <span class="reg-val">##</span>
-          </div>
+        <div class="reg-card">
+          <h3>Software Registration</h3>
+          <p class="reg-sub">Legal protection · Law nº 9.609/1998 (Brazil)</p>
+          <div class="reg-row"><span class="reg-key">Name</span><span class="reg-val">SLDM</span></div>
+          <div class="reg-row"><span class="reg-key">Full name</span><span class="reg-val" style="font-size:.75rem">Scientific Literature Data Miner</span></div>
+          <div class="reg-row"><span class="reg-key">Version</span><span class="reg-val">1.0.0</span></div>
+          <div class="reg-row"><span class="reg-key">DOI</span><span class="reg-val">XXXXXX</span></div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer>
   <div class="footer-inner">
     <div class="footer-logo"><span>S</span>LDM — Scientific Literature Data Miner</div>
     <div class="footer-copy">© 2026 SLDM Project · v1.0.0</div>
     <div class="footer-links">
       <a href="https://github.com/jvictorborsatto/Scientific-Literature-Data-Mining" target="_blank">GitHub</a>
-      <a href="#about"><span data-lang="en">About</span><span data-lang="pt">Sobre</span></a>
+      <a href="#about">About</a>
     </div>
   </div>
 </footer>
 
-<!-- JS -->
 <script>
-  /* ── language ── */
-  function setLang(lang, btn) {
-    document.body.className = 'lang-' + lang;
-    document.documentElement.lang = lang === 'pt' ? 'pt-BR' : 'en';
-    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  }
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+  });
 
-  /* ── navbar scroll ── */
-  const navbar = document.getElementById('navbar');
-  window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', window.scrollY > 20));
-
-  /* ── tabs ── */
   function switchTab(name, btn) {
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -651,57 +536,43 @@
     btn.classList.add('active');
   }
 
-  /* ── network canvas ── */
+  function switchMod(name, btn) {
+    document.querySelectorAll('.mod-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.mod-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('mod-' + name).classList.add('active');
+    btn.classList.add('active');
+  }
+
   (function () {
     const canvas = document.getElementById('network-canvas');
     const ctx = canvas.getContext('2d');
     const COLORS = ['#F2A7B0','#A8D4F5','#A8E6CF','#F5D190','#C5B8F0','#F5C4A1'];
     let W, H, nodes = [], mouse = { x: -999, y: -999 };
-    const N = 52, MAX_DIST = 160, MOUSE_R = 120;
-
+    const N = 50, MAX_DIST = 160, MOUSE_R = 120;
     function resize() { W = canvas.width = canvas.offsetWidth; H = canvas.height = canvas.offsetHeight; }
-    function mkNode() {
-      const color = COLORS[Math.floor(Math.random() * COLORS.length)];
-      return { x: Math.random()*W, y: Math.random()*H, vx: (Math.random()-.5)*.45, vy: (Math.random()-.5)*.45, r: Math.random()*3.5+2.5, color, alpha: Math.random()*.5+.5 };
-    }
-    function init() { resize(); nodes = Array.from({ length: N }, mkNode); }
-
+    function mkNode() { return { x: Math.random()*W, y: Math.random()*H, vx: (Math.random()-.5)*.45, vy: (Math.random()-.5)*.45, r: Math.random()*3.5+2.5, color: COLORS[Math.floor(Math.random()*COLORS.length)], alpha: Math.random()*.5+.5 }; }
+    function init() { resize(); nodes = Array.from({length:N}, mkNode); }
     function draw() {
       ctx.clearRect(0, 0, W, H);
       for (let i = 0; i < nodes.length; i++) {
         for (let j = i+1; j < nodes.length; j++) {
-          const a = nodes[i], b = nodes[j];
-          const dx = a.x-b.x, dy = a.y-b.y, dist = Math.sqrt(dx*dx+dy*dy);
+          const a = nodes[i], b = nodes[j], dx = a.x-b.x, dy = a.y-b.y, dist = Math.sqrt(dx*dx+dy*dy);
           if (dist > MAX_DIST) continue;
           const t = dist/MAX_DIST, opa = (1-t)*.28;
           const g = ctx.createLinearGradient(a.x,a.y,b.x,b.y);
           g.addColorStop(0, a.color+Math.round(opa*255).toString(16).padStart(2,'0'));
           g.addColorStop(1, b.color+Math.round(opa*255).toString(16).padStart(2,'0'));
-          ctx.beginPath(); ctx.strokeStyle=g; ctx.lineWidth=.8+(1-t)*.6;
-          ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+          ctx.beginPath(); ctx.strokeStyle=g; ctx.lineWidth=.8+(1-t)*.6; ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
         }
       }
       nodes.forEach(n => {
-        const dx=n.x-mouse.x, dy=n.y-mouse.y;
-        const boost = Math.sqrt(dx*dx+dy*dy) < MOUSE_R ? 1.4 : 1;
+        const dx=n.x-mouse.x, dy=n.y-mouse.y, boost=Math.sqrt(dx*dx+dy*dy)<MOUSE_R?1.4:1;
         ctx.beginPath(); ctx.arc(n.x,n.y,n.r*boost,0,Math.PI*2);
         ctx.fillStyle=n.color+Math.round(n.alpha*255).toString(16).padStart(2,'0'); ctx.fill();
-        const glow=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,n.r*4*boost);
-        glow.addColorStop(0,n.color+'22'); glow.addColorStop(1,n.color+'00');
-        ctx.beginPath(); ctx.arc(n.x,n.y,n.r*4*boost,0,Math.PI*2); ctx.fillStyle=glow; ctx.fill();
       });
     }
-
-    function update() {
-      nodes.forEach(n => {
-        n.x+=n.vx; n.y+=n.vy;
-        if(n.x<-20)n.x=W+20; if(n.x>W+20)n.x=-20;
-        if(n.y<-20)n.y=H+20; if(n.y>H+20)n.y=-20;
-      });
-    }
-
+    function update() { nodes.forEach(n => { n.x+=n.vx; n.y+=n.vy; if(n.x<-20)n.x=W+20; if(n.x>W+20)n.x=-20; if(n.y<-20)n.y=H+20; if(n.y>H+20)n.y=-20; }); }
     function loop() { update(); draw(); requestAnimationFrame(loop); }
-
     canvas.addEventListener('mousemove', e => { const r=canvas.getBoundingClientRect(); mouse.x=e.clientX-r.left; mouse.y=e.clientY-r.top; });
     canvas.addEventListener('mouseleave', () => { mouse.x=-999; mouse.y=-999; });
     window.addEventListener('resize', resize);
